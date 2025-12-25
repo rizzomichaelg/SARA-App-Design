@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Patient Recovery Companion</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-accent: #334155;
+            --primary: #38bdf8;
+            --primary-dim: rgba(56, 189, 248, 0.1);
+            --success: #10b981;
+            --urgent: #f43f5e;
+            --rest: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --gradient-sara: linear-gradient(135deg, #6366f1, #ec4899);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background-color: var(--bg-dark);
+            border-radius: 40px;
+            box-shadow: 0 0 0 12px #2d2d2d, 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background-color: #2d2d2d;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 100;
+        }
+
+        /* HEADER */
+        header {
+            padding: 50px 20px 10px 20px;
+            background: var(--bg-dark);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .greeting h1 {
+            font-size: 20px;
+            margin: 0;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .greeting p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 4px 0 0 0;
+        }
+
+        /* STOCK TICKER */
+        .momentum-ticker {
+            display: flex;
+            gap: 4px;
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            padding: 1px;
+            margin-top: 5px;
+        }
+
+        .ticker-segment {
+            height: 100%;
+            flex: 1;
+            background: var(--bg-accent);
+            border-radius: 2px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.5;
+        }
+
+        .ticker-segment.filled {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+            opacity: 1;
+        }
+
+        /* Journey Stepper */
+        .journey-stepper {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 5px;
+            padding: 0 10px;
+        }
+
+        .journey-line {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--bg-accent);
+            z-index: 0;
+        }
+
+        .step-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            z-index: 1;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .step-node.active {
+            opacity: 1;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .step-node.active .step-circle {
+            border-color: var(--primary);
+            background: var(--bg-dark);
+            color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+            transform: scale(1.1);
+        }
+
+        .step-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 200px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        main::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* FOCUS VIEW (DECK) */
+        .focus-view {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .deck-container {
+            width: 100%;
+            height: 480px;
+            position: relative;
+            perspective: 1000px;
+            margin-top: 10px;
+            overflow: visible;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 24px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            /* URGENT INDICATOR (Default) */
+            border-left: 6px solid var(--urgent);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.rest-card {
+            border-left: 6px solid var(--rest);
+        }
+
+        .card.active {
+            z-index: 10;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        .card.next {
+            z-index: 5;
+            transform: translateY(15px) scale(0.95);
+            opacity: 0.6;
+            filter: blur(1px);
+        }
+
+        /* SUCCESS STATE FIX: Opaque background with Green Tint Layer */
+        .card.success {
+            border-color: var(--success);
+            /* Layering a green tint over the opaque card background to prevent see-through */
+            background: linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15)), var(--bg-card);
+            border-left: 6px solid var(--success);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* PREVIEW CARD - Positioned safely */
+        .card.preview {
+            z-index: 1;
+            opacity: 0.9;
+            filter: grayscale(1);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-left: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(30, 41, 59, 0.5);
+            height: auto;
+            min-height: 100px;
+            top: auto;
+            bottom: -110px;
+            transform: none;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            align-self: flex-start;
+        }
+
+        .tag.do {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--primary);
+        }
+
+        .tag.learn {
+            background: rgba(52, 211, 153, 0.2);
+            color: var(--success);
+        }
+
+        .tag.check {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+        }
+
+        .tag.rest {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--rest);
+        }
+
+        .card h2 {
+            font-size: 26px;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
+            flex: 1;
+        }
+
+        .community-tip {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .tip-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .ai-prompt {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ai-prompt:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .ai-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-sara);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .ai-text {
+            font-size: 13px;
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #0f172a;
+            flex: 2;
+            transition: background 0.3s;
+        }
+
+        .btn-rest {
+            background: var(--rest);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            flex: 1;
+        }
+
+        /* Removed .swipe-hints as they were overlapping/redundant */
+
+        /* --- INPUT MODAL --- */
+        .input-modal {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 55%;
+            background: var(--bg-card);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            z-index: 150;
+            transform: translateY(110%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-modal.open {
+            transform: translateY(0);
+        }
+
+        .slider-container {
+            width: 100%;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .emoji-display {
+            font-size: 60px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: var(--bg-accent);
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        /* --- JOURNEY & LIBRARY --- */
+        .journey-view {
+            padding: 20px 24px;
+            display: none;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 7px;
+            top: 24px;
+            bottom: -30px;
+            width: 2px;
+            background: var(--bg-accent);
+            z-index: 0;
+        }
+
+        .timeline-item:last-child .timeline-line {
+            display: none;
+        }
+
+        .status-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--text-muted);
+            z-index: 1;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .status-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .status-dot.done {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        .library-view {
+            padding: 20px;
+            display: none;
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .asset-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .asset-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        /* FAB & Chat */
+        .fab-sara {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: var(--gradient-sara);
+            border: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .fab-icon {
+            width: 32px;
+            height: 32px;
+            background-color: white;
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>');
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+        }
+
+        .chat-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .chat-overlay.open {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            padding: 50px 20px 20px;
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .close-chat-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message.sara {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: #0f172a;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            font-weight: 500;
+        }
+
+        .chat-input-area {
+            padding: 16px 16px 40px 16px;
+            background: var(--bg-card);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Nav */
+        nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 10px;
+            cursor: pointer;
+            width: 70px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            background-color: currentColor;
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+        }
+
+        .icon-focus {
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>');
+        }
+
+        .icon-journey {
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>');
+        }
+
+        .icon-library {
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>');
+        }
+
+        .slide-out-right {
+            transform: translateX(400px) rotate(10deg) !important;
+            opacity: 0 !important;
+        }
+
+        .slide-out-left {
+            transform: translateX(-400px) rotate(-10deg) !important;
+            opacity: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="phone-frame">
+        <div class="notch"></div>
+
+        <header>
+            <div class="header-top">
+                <div class="greeting">
+                    <h1 id="header-title">Day 2 Before Surgery</h1>
+                    <p>You are on track.</p>
+                </div>
+                <div
+                    style="width: 36px; height: 36px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                    MR</div>
+            </div>
+
+            <!-- STOCK TICKER (Separate Row) -->
+            <div class="momentum-ticker" id="momentum-ticker"></div>
+
+            <div class="journey-stepper">
+                <div class="journey-line"></div>
+                <div class="step-node active" onclick="switchTab('focus', document.querySelectorAll('.nav-item')[0])">
+                    <div class="step-circle">✔</div>
+                    <div class="step-label">Pre-Op</div>
+                </div>
+                <div class="step-node active">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" style="color: var(--primary);">Surgery</div>
+                </div>
+                <div class="step-node">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Recovery</div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- FOCUS VIEW -->
+            <div id="view-focus" class="focus-view">
+                <div class="deck-container" id="card-deck"></div>
+                <!-- Removed Swipe Hints -->
+            </div>
+
+            <!-- JOURNEY VIEW -->
+            <div id="view-journey" class="journey-view">
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot done"></div>
+                    <div class="timeline-content" style="opacity: 0.6;">
+                        <span style="font-size:12px; color:var(--text-muted);">Oct 12</span>
+                        <h3 style="margin:0; font-size:16px;">Medical Clearance</h3>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot active"></div>
+                    <div class="timeline-content">
+                        <span style="font-size:12px; color:var(--text-muted);">Today</span>
+                        <h3 style="margin:0; font-size:16px;">Pre-Op Guidelines</h3>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot"></div>
+                    <div class="timeline-content">
+                        <span style="font-size:12px; color:var(--text-muted);">Oct 25</span>
+                        <h3 style="margin:0; font-size:16px;">Surgery Day</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIBRARY VIEW -->
+            <div id="view-library" class="library-view">
+                <input type="text" class="library-search" placeholder="Search guides, videos...">
+                <h3 style="font-size:16px; margin-bottom:15px;">Pinned for Today</h3>
+                <div class="asset-card" style="flex-direction:row; align-items:center; margin-bottom:20px;">
+                    <div class="asset-icon"
+                        style="background: rgba(244, 114, 182, 0.1); color: #f472b6; margin-right: 12px;">▶</div>
+                    <div>
+                        <div style="font-weight:600;">How to Wash</div>
+                        <div style="font-size:12px; color:var(--text-muted);">Required for tonight</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- INPUT MODAL -->
+        <div id="input-modal" class="input-modal">
+            <h2 style="margin:0;">How are you feeling?</h2>
+            <p style="color:var(--text-muted);">Anxiety Level</p>
+            <div class="emoji-display" id="emoji-display">😐</div>
+            <div class="slider-container">
+                <input type="range" min="1" max="5" value="3" id="data-slider" oninput="updateEmoji(this.value)">
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="submitData()">Save Log</button>
+            <button class="btn btn-secondary" style="width:100%; margin-top:10px; background:none;"
+                onclick="closeModal()">Cancel</button>
+        </div>
+
+        <!-- FAB -->
+        <button class="fab-sara" onclick="toggleChat(true)">
+            <div class="fab-icon"></div>
+        </button>
+
+        <!-- CHAT OVERLAY -->
+        <div id="chat-overlay" class="chat-overlay">
+            <div class="chat-header">
+                <div>
+                    <h2 style="margin:0; font-size:18px;">Ask SARA</h2>
+                    <p style="margin:0; font-size:12px; color:var(--text-muted);">AI Recovery Assistant</p>
+                </div>
+                <button class="close-chat-btn" onclick="toggleChat(false)">×</button>
+            </div>
+            <div class="chat-messages" id="chat-history">
+                <div class="message sara">
+                    Hi Mike! Do you have questions about your clear liquid diet for tonight?
+                    <span class="message-time">Just now</span>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input-field" placeholder="Type a message..."
+                    onkeypress="handleEnter(event)">
+                <button class="btn btn-primary"
+                    style="width:40px; height:40px; border-radius:50%; padding:0; flex:none;"
+                    onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('focus', this)">
+                <div class="nav-icon icon-focus"></div>
+                <span>Today</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('journey', this)">
+                <div class="nav-icon icon-journey"></div>
+                <span>Journey</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('library', this)">
+                <div class="nav-icon icon-library"></div>
+                <span>Library</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                id: 1,
+                type: 'learn',
+                title: 'Review Anesthesia',
+                desc: 'A quick read to prepare you.',
+                aiPrompt: 'Will I be asleep?',
+                btnPrimary: 'Read Guide',
+                btnSecondary: 'Later',
+                tip: '💡 85% of patients felt more relaxed after reading this.'
+            },
+            {
+                id: 2,
+                type: 'check',
+                title: 'Evening Vitals',
+                desc: 'Log your anxiety level before bed.',
+                aiPrompt: 'Is nervousness normal?',
+                btnPrimary: 'Log Vitals',
+                btnSecondary: 'Skip',
+                hasInput: true
+            },
+            {
+                id: 3,
+                type: 'rest',
+                title: 'Active Recovery',
+                desc: 'Rest is part of the work. Take a 20 min break with legs elevated.',
+                aiPrompt: 'Why elevate?',
+                btnPrimary: 'I Rested',
+                btnSecondary: 'Later'
+            }
+        ];
+
+        let currentIndex = 0;
+        let isAnimating = false;
+
+        function initTicker() {
+            const container = document.getElementById('momentum-ticker');
+            container.innerHTML = '';
+            steps.forEach(() => {
+                const seg = document.createElement('div');
+                seg.className = 'ticker-segment';
+                container.appendChild(seg);
+            });
+        }
+
+        function updateTicker(idx) {
+            const segs = document.querySelectorAll('.ticker-segment');
+            if (segs[idx]) segs[idx].classList.add('filled');
+        }
+
+        function renderDeck() {
+            const container = document.getElementById('card-deck');
+
+            container.innerHTML = '';
+            isAnimating = false;
+
+            const cardsToRender = steps.slice(currentIndex, currentIndex + 2);
+
+            if (cardsToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="card active" style="display:flex; justify-content:center; align-items:center; text-align:center; border-left:none;">
+                        <div>
+                            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+                            <h2>You're all set!</h2>
+                            <p>Great job. Data sent to Dr. Kaplan's Team.</p>
+                        </div>
+                    </div>
+                    <div class="card preview" style="display:flex; flex-direction:row; align-items:center; gap:15px; padding:15px; ">
+                        <div style="background:var(--bg-accent); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;">🔒</div>
+                        <div style="text-align:left;">
+                            <div style="font-weight:bold; font-size:14px; color:var(--text-muted);">Coming Tomorrow</div>
+                            <div style="font-size:12px; color:var(--text-muted);">First Shower & Hibiclens</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            cardsToRender.forEach((step, i) => {
+                const isTop = i === 0;
+                const cardEl = document.createElement('div');
+                cardEl.className = `card ${isTop ? 'active' : 'next'} ${step.type === 'rest' ? 'rest-card' : ''}`;
+
+                const tipHTML = step.tip ? `<div class="community-tip"><span class="tip-text">${step.tip}</span></div>` : '';
+                const btnText = step.type === 'rest' ? 'I Rested' : step.btnPrimary;
+                const btnClass = step.type === 'rest' ? 'btn-rest' : 'btn-primary';
+
+                cardEl.innerHTML = `
+                    <div class="tag ${step.type}">${step.type === 'check' ? 'Check-In' : step.type === 'rest' ? 'Recovery' : 'Task'}</div>
+                    <h2>${step.title}</h2>
+                    <p>${step.desc}</p>
+                    ${tipHTML}
+                    <div class="ai-prompt" onclick="askSaraContext('${step.aiPrompt}')">
+                        <div class="ai-avatar">AI</div>
+                        <span class="ai-text">Ask SARA: "${step.aiPrompt}"</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" onclick="snoozeCard()">${step.btnSecondary}</button>
+                        <button class="btn ${btnClass}" onclick="handlePrimaryAction()">${btnText}</button>
+                    </div>
+                `;
+                container.appendChild(cardEl);
+            });
+        }
+
+        function handlePrimaryAction() {
+            if (isAnimating) return;
+            const step = steps[currentIndex];
+            if (step && step.hasInput) openModal();
+            else completeCard();
+        }
+
+        function completeCard() {
+            const currentCard = document.querySelector('.card.active');
+            if (!currentCard) return;
+            isAnimating = true;
+            currentCard.classList.add('success');
+            updateTicker(currentIndex);
+            setTimeout(() => {
+                currentCard.classList.add('slide-out-right');
+                setTimeout(() => { currentIndex++; renderDeck(); }, 300);
+            }, 500);
+        }
+
+        function snoozeCard() {
+            if (isAnimating) return;
+            const currentCard = document.querySelector('.card.active');
+            if (!currentCard) return;
+            isAnimating = true;
+            currentCard.classList.add('slide-out-left');
+            setTimeout(() => {
+                const item = steps[currentIndex];
+                steps.splice(currentIndex, 1);
+                steps.push(item);
+                renderDeck();
+            }, 300);
+        }
+
+        function openModal() { document.getElementById('input-modal').classList.add('open'); }
+        function closeModal() { document.getElementById('input-modal').classList.remove('open'); }
+
+        function updateEmoji(val) {
+            const emojis = ['😫', '😟', '😐', '🙂', '😃'];
+            document.getElementById('emoji-display').innerText = emojis[val - 1];
+        }
+
+        function submitData() {
+            closeModal();
+            setTimeout(completeCard, 300);
+        }
+
+        function switchTab(viewName, navEl) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navEl.classList.add('active');
+            ['focus', 'journey', 'library'].forEach(v => document.getElementById('view-' + v).style.display = 'none');
+            const view = document.getElementById('view-' + viewName);
+            if (viewName === 'focus') view.style.display = 'flex'; else view.style.display = 'block';
+        }
+
+        function toggleChat(show) {
+            const overlay = document.getElementById('chat-overlay');
+            if (show) overlay.classList.add('open'); else overlay.classList.remove('open');
+        }
+
+        function askSaraContext(question) {
+            toggleChat(true);
+            addMessage(question, 'user');
+            setTimeout(() => { respondTo(question); }, 800);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input-field');
+            const text = input.value.trim();
+            if (text) {
+                addMessage(text, 'user');
+                input.value = '';
+                setTimeout(() => { respondTo(text); }, 1000);
+            }
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function addMessage(text, type) {
+            const container = document.getElementById('chat-history');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = `${text} <span class="message-time">Just now</span>`;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function respondTo(text) {
+            let response = "I can help with that. Please consult your care team for urgent medical issues.";
+            if (text.toLowerCase().includes('nausea')) response = "It's common to feel slight nausea after anesthesia. Small sips of ginger ale usually help.";
+            addMessage(response, 'sara');
+        }
+
+        initTicker();
+        renderDeck();
+    </script>
+</body>
+
+</html>
