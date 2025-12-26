@@ -10,6 +10,10 @@
             --bg-card: #1e293b;
             --bg-accent: #334155;
             
+            /* RESTORED PRIMARY COLOR */
+            --primary: #38bdf8;
+            --primary-dim: rgba(56, 189, 248, 0.1);
+
             /* Category Colors */
             --col-do: #38bdf8;    
             --col-learn: #a78bfa; 
@@ -361,7 +365,8 @@
         .reminder-opt:hover { background: var(--bg-accent); }
         
         /* INPUT MODAL */
-        .input-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: var(--bg-card); border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 150; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.1); }
+        /* Increased z-index from 150 to 300 to sit ABOVE the nav bar */
+        .input-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: var(--bg-card); border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 300; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.1); }
         .input-modal.open { transform: translateY(0); }
         
         .slider-container { width: 100%; margin: 30px 0; text-align: center; position: relative; padding: 0 10px; }
@@ -425,17 +430,35 @@
         .fab-icon { width: 32px; height: 32px; background-color: white; -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; }
         
         /* CHAT */
-        /* Increased z-index to 300 to sit ABOVE the nav bar (which is 200) */
         .chat-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 300; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .chat-overlay.open { transform: translateY(0); }
         .chat-header { padding: 50px 20px 20px; background: var(--bg-card); display: flex; flex-direction:column; gap:10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .chat-context-chip { font-size: 11px; background: rgba(56, 189, 248, 0.15); color: var(--primary); padding: 4px 8px; border-radius: 4px; align-self: flex-start; }
         .close-chat-btn { position:absolute; top:50px; right:20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-        .message { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; }
+        
+        .chat-messages { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            min-height: 0; 
+        }
+        
+        .message { 
+            max-width: 80%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            position: relative; 
+            flex-shrink: 0; 
+        }
         .message.sara { background: var(--bg-card); color: var(--text-main); border-bottom-left-radius: 4px; align-self: flex-start; }
-        .message.user { background: var(--primary); color: #0f172a; border-bottom-right-radius: 4px; align-self: flex-end; font-weight: 500; }
-        .quick-replies { display: flex; gap: 8px; padding: 0 20px 10px; overflow-x: auto; }
+        .message.user { background: var(--primary); color: #0f172a; border-bottom-right-radius: 4px; align-self: flex-end; font-weight: 600; }
+        
+        .quick-replies { display: flex; gap: 8px; padding: 0 20px 10px; overflow-x: auto; flex-shrink: 0; }
         .quick-reply-pill { white-space: nowrap; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 8px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
         .chat-input-area { padding: 16px 16px 40px 16px; background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; }
         .chat-input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 12px 16px; color: white; font-size: 14px; }
@@ -807,16 +830,22 @@
                 chip.innerText = `Context: ${context}`;
                 chip.style.display = 'block';
             }
-            addMessage(question, 'user');
-            setTimeout(() => { respondTo(question); }, 800);
+            // Delay slightly to allow UI to settle
+            setTimeout(() => {
+                sendMessage(question);
+            }, 100);
         }
 
         function sendMessage(txt) {
-            const text = txt || document.getElementById('chat-input-field').value.trim();
+            const inputEl = document.getElementById('chat-input-field');
+            // robust check: use txt if it's a string, otherwise use input value
+            const text = (typeof txt === 'string' ? txt : inputEl.value).trim();
+            
             if(text) {
                 addMessage(text, 'user');
-                document.getElementById('chat-input-field').value = '';
-                setTimeout(() => { respondTo(text); }, 1000);
+                inputEl.value = '';
+                // Simulate AI typing delay
+                setTimeout(() => { respondTo(text); }, 600);
             }
         }
 
@@ -828,7 +857,10 @@
             msg.className = `message ${type}`;
             msg.innerText = text;
             container.appendChild(msg);
-            container.scrollTop = container.scrollHeight;
+            // Force scroll to bottom
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 10);
         }
 
         function respondTo(text) {
