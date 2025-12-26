@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Patient Recovery Companion</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-accent: #334155;
+            
+            /* Enhanced Palette */
+            --col-do: #38bdf8;    
+            --col-learn: #818cf8; 
+            --col-check: #fbbf24; 
+            --col-rest: #34d399;  
+            --col-support: #f472b6;
+            
+            --success: #10b981; 
+            --urgent: #f43f5e; 
+            --primary: #38bdf8;
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            --gradient-sara: linear-gradient(135deg, #6366f1, #ec4899);
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; background-color: #020617; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            color: var(--text-main);
+        }
+
+        .phone-frame { 
+            width: 375px; height: 812px; 
+            background-color: var(--bg-dark); 
+            border-radius: 40px; 
+            box-shadow: 0 0 0 12px #1e293b, 0 20px 50px rgba(0,0,0,0.8); 
+            position: relative; overflow: hidden; 
+            display: flex; flex-direction: column; 
+        }
+        
+        .notch { 
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); 
+            width: 150px; height: 30px; 
+            background-color: #1e293b; 
+            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; 
+            z-index: 100; 
+        }
+
+        /* --- HEADER --- */
+        header { 
+            padding: 50px 20px 15px 20px; 
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(10px);
+            z-index: 10; 
+            display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .greeting h1 { font-size: 20px; margin: 0; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+        .greeting p { color: var(--text-muted); font-size: 13px; margin: 4px 0 0 0; }
+
+        .calm-btn { 
+            background: rgba(255,255,255,0.08); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; padding: 6px 12px; 
+            font-size: 11px; font-weight: 600; color: var(--text-main); 
+            display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; 
+        }
+        .calm-btn:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
+
+        .help-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+        .profile-avatar { width: 36px; height: 36px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* PROGRESS */
+        .progress-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .progress-text { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 80px; letter-spacing: 0.5px; }
+        .momentum-ticker { flex: 1; display: flex; gap: 4px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; }
+        .ticker-segment { height: 100%; flex: 1; background: var(--bg-accent); border-radius: 2px; transition: all 0.5s ease; opacity: 0.3; }
+        .ticker-segment.filled { background: var(--success); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); opacity: 1; }
+
+        /* JOURNEY STEPPER */
+        .journey-stepper { display: flex; justify-content: space-between; position: relative; margin-top: 5px; padding: 0 12px; }
+        .journey-line { position: absolute; top: 14px; left: 25px; right: 25px; height: 2px; background: var(--bg-accent); z-index: 0; }
+        .step-node { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; cursor: pointer; opacity: 0.5; transition: all 0.2s; }
+        .step-node.active { opacity: 1; }
+        .step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: var(--text-muted); transition: all 0.2s; }
+        .step-node.active .step-circle { border-color: var(--primary); background: var(--bg-dark); color: var(--primary); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); transform: scale(1.1); }
+        .step-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- MAIN AREA --- */
+        main { 
+            flex: 1; position: relative; overflow-y: auto; 
+            padding-bottom: 120px; /* Prevents overlap with nav */
+            scrollbar-width: none; 
+        }
+        main::-webkit-scrollbar { display: none; }
+
+        /* --- CARD DECK --- */
+        .focus-view { 
+            height: 100%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: flex-start; padding: 20px; 
+        }
+        .deck-container { 
+            width: 100%; height: 500px; /* Increased height */
+            position: relative; perspective: 1000px; margin-top: 10px; overflow: visible; 
+        }
+
+        .card { 
+            width: 100%; height: 100%; 
+            background: var(--bg-card); 
+            border-radius: 24px; padding: 24px; 
+            position: absolute; top: 0; left: 0; 
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: var(--shadow-card); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            display: flex; flex-direction: column; 
+            border-left-width: 6px; border-left-style: solid;
+        }
+
+        /* Card Category Colors */
+        .card[data-type="do"] { border-left-color: var(--col-do); }
+        .card[data-type="learn"] { border-left-color: var(--col-learn); }
+        .card[data-type="check"] { border-left-color: var(--col-check); }
+        .card[data-type="rest"] { border-left-color: var(--col-rest); }
+        .card[data-type="support"] { border-left-color: var(--col-support); background: linear-gradient(rgba(244, 114, 182, 0.05), rgba(244, 114, 182, 0.05)), var(--bg-card); }
+
+        .card.active { z-index: 10; transform: translateY(0) scale(1); opacity: 1; }
+        .card.next { z-index: 5; transform: translateY(15px) scale(0.95); opacity: 0.6; filter: blur(2px); }
+        .card.success { border-color: var(--success); background: linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15)), var(--bg-card); border-left-color: var(--success); box-shadow: 0 0 40px rgba(16, 185, 129, 0.2); }
+
+        /* Card Content Layout */
+        .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-shrink: 0; }
+        .tag { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 6px 10px; border-radius: 6px; }
+        .card[data-type="do"] .tag { color: var(--col-do); background: rgba(56, 189, 248, 0.15); }
+        .card[data-type="learn"] .tag { color: var(--col-learn); background: rgba(129, 140, 248, 0.15); }
+        .card[data-type="check"] .tag { color: var(--col-check); background: rgba(251, 191, 36, 0.15); }
+        .card[data-type="rest"] .tag { color: var(--col-rest); background: rgba(52, 211, 153, 0.15); }
+        .card[data-type="support"] .tag { color: var(--col-support); background: rgba(244, 114, 182, 0.15); }
+
+        .time-anchor { font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        
+        .card-content-scroll {
+            flex: 1; /* Takes available space */
+            overflow-y: auto; /* Scrolls if content is too long */
+            margin-bottom: 16px;
+            padding-right: 4px; /* Space for scrollbar */
+        }
+        
+        .card h2 { font-size: 26px; margin: 0 0 10px 0; line-height: 1.1; font-weight: 700; }
+        .card-desc { color: var(--text-muted); font-size: 16px; line-height: 1.5; margin: 0 0 16px 0; }
+        
+        .why-it-matters { 
+            background: rgba(255,255,255,0.03); 
+            border-left: 2px solid var(--text-muted); 
+            padding: 12px 14px; 
+            font-size: 13px; color: var(--text-main); font-style: italic; 
+            border-radius: 0 8px 8px 0; margin-bottom: 10px;
+        }
+
+        .ai-prompt { 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.02);
+            border-radius: 30px; 
+            padding: 8px 14px; 
+            display: inline-flex; align-items: center; gap: 8px; 
+            cursor: pointer; margin-top: auto; flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .ai-prompt:active { background: rgba(255,255,255,0.08); }
+        .ai-text { font-size: 12px; color: var(--primary); font-weight: 600; }
+
+        .card-actions { display: flex; gap: 12px; margin-top: 16px; flex-shrink: 0; }
+        .btn { 
+            padding: 16px 12px; border-radius: 16px; border: none; 
+            font-size: 15px; font-weight: 600; cursor: pointer; 
+            transition: transform 0.1s; display: flex; align-items: center; justify-content: center; 
+            white-space: nowrap; 
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: #ffffff; flex: 1.5; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); flex: 1; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        .confidence-check { display: none; flex-direction: column; gap: 10px; margin-top: 16px; flex-shrink: 0; }
+        .confidence-check.visible { display: flex; animation: fadeIn 0.3s ease; }
+        .confidence-btn { padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 14px; cursor: pointer; text-align: left; transition: background 0.2s; }
+        .confidence-btn:active { background: rgba(255,255,255,0.1); }
+
+        /* --- JOURNEY & LIBRARY VIEWS --- */
+        .journey-view { padding: 20px 24px; display: none; }
+        .timeline-section-title { font-size: 14px; font-weight: 700; color: var(--primary); margin: 24px 0 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .timeline-section-title:first-child { margin-top: 0; }
+        
+        .timeline-item { display: flex; gap: 16px; margin-bottom: 24px; position: relative; }
+        /* Continuous Line Fix */
+        .timeline-line { position: absolute; left: 7px; top: 24px; bottom: -30px; width: 2px; background: var(--bg-accent); z-index: 0; }
+        .timeline-item:last-child .timeline-line { display: none; }
+        
+        .status-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--text-muted); z-index: 1; margin-top: 4px; flex-shrink: 0; }
+        .status-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2); }
+        .status-dot.done { background: var(--success); border-color: var(--success); }
+        
+        .timeline-content { flex: 1; background: var(--bg-card); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .timeline-date { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 500; }
+        .timeline-title { margin: 0; font-size: 16px; font-weight: 600; }
+
+        /* Library Styling */
+        .library-view { padding: 20px; display: none; }
+        .library-search { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); width: 100%; padding: 14px 16px; border-radius: 12px; color: white; margin-bottom: 24px; font-size: 14px; }
+        .library-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        .asset-card { 
+            background: var(--bg-card); border-radius: 16px; padding: 16px; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s; 
+        }
+        .asset-card:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        .asset-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 18px; }
+        .asset-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+        .asset-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* --- FINAL SCREEN --- */
+        .all-set-view { width: 100%; display: flex; flex-direction: column; gap: 16px; animation: fadeIn 0.5s ease; padding-bottom: 40px; }
+        .done-card { background: var(--bg-card); border-radius: 24px; padding: 40px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
+        .preview-card { background: rgba(30, 41, 59, 0.6); border-radius: 20px; padding: 20px; display: flex; gap: 15px; align-items: center; border: 2px dashed rgba(255,255,255,0.15); }
+
+        /* --- MODALS & CHAT --- */
+        /* Chat Overlay */
+        .chat-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 300; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .chat-overlay.open { transform: translateY(0); }
+        .chat-header { padding: 50px 20px 20px; background: var(--bg-card); display: flex; flex-direction:column; gap:10px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+        .chat-context-chip { font-size: 11px; background: rgba(56, 189, 248, 0.15); color: var(--primary); padding: 4px 8px; border-radius: 4px; align-self: flex-start; }
+        .close-chat-btn { position:absolute; top:50px; right:20px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; flex-shrink: 0; }
+        .message.sara { background: var(--bg-card); color: var(--text-main); border-bottom-left-radius: 4px; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); }
+        .message.user { background: var(--primary); color: #ffffff; border-bottom-right-radius: 4px; align-self: flex-end; font-weight: 600; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.2); }
+        
+        /* RESTORED RAG STYLES */
+        .rag-source { display: inline-block; font-size: 10px; color: var(--primary); background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 4px; margin-bottom: 6px; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .rag-quote { border-left: 2px solid var(--primary); padding-left: 8px; color: var(--text-muted); font-style: italic; margin: 8px 0; font-size: 13px; }
+        .rag-action { margin-top: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; font-size: 12px; color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .rag-action:hover { background: rgba(255,255,255,0.1); }
+
+        .quick-replies { display: flex; gap: 8px; padding: 0 20px 10px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+        .quick-reply-pill { white-space: nowrap; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 8px 14px; font-size: 12px; color: var(--text-main); cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+        
+        .chat-input-area { padding: 16px 16px 40px 16px; background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; flex-shrink: 0; }
+        .chat-input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 12px 16px; color: white; font-size: 14px; }
+
+        /* GUIDE VIEWER OVERLAY (FIXED SCROLL) */
+        .guide-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 400; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease; }
+        .guide-overlay.open { transform: translateX(0); }
+        .guide-header { padding: 50px 20px 20px; background: var(--bg-card); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+        .guide-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
+        .guide-card-deck { height: 100%; position: relative; }
+        
+        /* UPDATED SLIDE CSS */
+        .guide-slide { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-card); border-radius: 16px; padding: 24px; 
+            display: flex; flex-direction: column; 
+            opacity: 0; transform: translateX(50px); transition: all 0.3s ease; 
+            pointer-events: none; 
+            overflow-y: auto; /* FIX: Enable internal scrolling */
+        }
+        .guide-slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        
+        /* Guide Content Spacer */
+        .guide-text-content { padding-bottom: 20px; }
+
+        .guide-nav { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); padding-bottom: 40px; flex-shrink: 0; z-index: 10; } 
+        .guide-progress { font-size: 12px; color: var(--text-muted); }
+
+        /* Input Modal */
+        .input-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: var(--bg-card); border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 300; transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 30px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.1); }
+        .input-modal.open { transform: translateY(0); }
+        .slider-container { width: 100%; margin: 30px 0; text-align: center; position: relative; padding: 0 10px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: linear-gradient(to right, var(--urgent), var(--col-check), var(--success)); outline: none; margin: 0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #ffffff; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.5); border: 4px solid var(--bg-card); margin-top: -2px; }
+        .slider-labels { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; padding: 0 5px; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+
+        /* FAB & NAV */
+        .fab-sara { position: absolute; bottom: 100px; right: 20px; width: 56px; height: 56px; border-radius: 28px; background: var(--gradient-sara); border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: transform 0.2s; }
+        .fab-sara:active { transform: scale(0.95); }
+        .fab-icon-svg { width: 32px; height: 32px; color: white; }
+
+        nav { position: absolute; bottom: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; align-items: center; z-index: 200; backdrop-filter: blur(10px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 10px; cursor: pointer; width: 70px; transition: color 0.2s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { width: 24px; height: 24px; background-color: currentColor; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; transition: background-color 0.2s; }
+        
+        .icon-focus { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'); }
+        .icon-journey { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'); }
+        .icon-library { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'); }
+
+        /* Animation Classes */
+        .slide-out-right { transform: translateX(400px) rotate(10deg) !important; opacity: 0 !important; }
+        .slide-out-left { transform: translateX(-400px) rotate(-10deg) !important; opacity: 0 !important; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        .toast { position: absolute; top: 120px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #10b981; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 500; display: flex; align-items: center; gap: 8px; }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .reminder-popup { position: absolute; bottom: 90px; left: 20px; right: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 100; }
+        .reminder-popup.open { display: flex; animation: fadeIn 0.2s ease; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        <div class="notch"></div>
+
+        <header>
+            <div class="header-top">
+                <div class="greeting">
+                    <h1 id="header-title">Day 2 Before Surgery</h1>
+                    <div class="progress-container">
+                        <span class="progress-text" id="progress-text">3 steps • ~6 min</span>
+                        <div class="momentum-ticker" id="momentum-ticker"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="calm-btn" onclick="alert('Playing 60s Breathing Audio...')">
+                        <span style="font-size:14px;">☁️</span> 60s Reset
+                    </div>
+                    <div class="help-icon" onclick="toggleChat(true, 'Help')">?</div>
+                    <div class="profile-avatar">MR</div>
+                </div>
+            </div>
+
+            <div class="journey-stepper">
+                <div class="journey-line"></div>
+                <div class="step-node active"><div class="step-circle">✔</div><div class="step-label">Pre-Op</div></div>
+                <div class="step-node active"><div class="step-circle">2</div><div class="step-label" style="color: var(--primary);">Surgery</div></div>
+                <div class="step-node"><div class="step-circle">3</div><div class="step-label">Recovery</div></div>
+            </div>
+        </header>
+
+        <div id="toast" class="toast">✅ Reminder set for 7:00 PM</div>
+
+        <main>
+            <div id="view-focus" class="focus-view">
+                <div class="deck-container" id="card-deck"></div>
+            </div>
+            
+            <div id="view-journey" class="journey-view" style="display:none;">
+                <div class="timeline-section-title">Completed</div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot done"></div>
+                    <div class="timeline-content" style="opacity: 0.7;">
+                        <span class="timeline-date">Oct 12</span>
+                        <h3 class="timeline-title">Medical Clearance</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Lab results reviewed.</p>
+                    </div>
+                </div>
+                <div class="timeline-section-title">Today</div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot active"></div>
+                    <div class="timeline-content" style="border:1px solid var(--primary); background: rgba(56, 189, 248, 0.05);">
+                        <span class="timeline-date">Today</span>
+                        <h3 class="timeline-title">Pre-Op Guidelines</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Complete your 3 daily steps.</p>
+                    </div>
+                </div>
+                <div class="timeline-section-title">Upcoming</div>
+                 <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">Oct 25</span>
+                        <h3 class="timeline-title">Surgery Day</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Arrival at 6:00 AM.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-library" class="library-view" style="display:none;">
+                <input type="text" class="library-search" placeholder="Search guides, videos...">
+                <h3 style="font-size:14px; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Pinned</h3>
+                <div class="asset-card" style="flex-direction:row; align-items:center;">
+                    <div class="asset-icon" style="background: rgba(244, 114, 182, 0.1); color: #f472b6; margin-right: 8px;">▶</div>
+                    <div>
+                        <div class="asset-title">How to Wash</div>
+                        <div class="asset-meta">Required for tonight</div>
+                    </div>
+                </div>
+                <h3 style="font-size:14px; margin:24px 0 12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">All Resources</h3>
+                <div class="library-grid">
+                    <div class="asset-card">
+                        <div class="asset-icon" style="margin-bottom:10px; background: rgba(96, 165, 250, 0.1); color: #60a5fa;">PDF</div>
+                        <div class="asset-title">Anesthesia Guide</div>
+                        <div class="asset-meta">3 min read</div>
+                    </div>
+                    <div class="asset-card">
+                        <div class="asset-icon" style="margin-bottom:10px; background: rgba(52, 211, 153, 0.1); color: #34d399;">PDF</div>
+                        <div class="asset-title">Wound Care</div>
+                        <div class="asset-meta">Instructions</div>
+                    </div>
+                    <div class="asset-card">
+                        <div class="asset-icon" style="margin-bottom:10px; background: rgba(251, 191, 36, 0.1); color: #fbbf24;">📝</div>
+                        <div class="asset-title">Pain Log</div>
+                        <div class="asset-meta">Tracker</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- REMINDERS -->
+        <div id="reminder-popup" class="reminder-popup">
+            <div class="reminder-opt" onclick="snoozeAction('1hr')">In 1 hour <span>⏰</span></div>
+            <div class="reminder-opt" onclick="snoozeAction('tonight')">Tonight (7 PM) <span>🌙</span></div>
+            <div class="reminder-opt" onclick="snoozeAction('tomorrow')">Tomorrow Morning <span>☀️</span></div>
+        </div>
+
+        <!-- INPUT MODAL (CHECK-IN) -->
+        <div id="input-modal" class="input-modal">
+            <h2 style="margin:0;">Quick Check-in</h2>
+            <p style="color:var(--text-muted); margin-bottom:30px;">How confident do you feel about the plan?</p>
+            <div id="emoji-display" style="font-size:60px; margin-bottom:10px;">😐</div>
+            <p id="slider-label" style="color:var(--primary); font-size:14px; font-weight:bold;">Somewhat Confident</p>
+            <div class="slider-container">
+                <input type="range" min="1" max="5" value="3" id="data-slider" oninput="updateEmoji(this.value)">
+                <div class="slider-labels"><span>Unsure</span><span>Ready</span></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="submitData()">Save</button>
+            <button class="btn btn-secondary" style="width:100%; margin-top:10px; background:none;" onclick="closeModal()">Cancel</button>
+        </div>
+
+        <!-- GUIDE VIEWER OVERLAY -->
+        <div id="guide-overlay" class="guide-overlay">
+            <div class="guide-header">
+                <div><h2 style="margin:0; font-size:18px;">Anesthesia Guide</h2></div>
+                <button class="close-chat-btn" style="position:static; width:30px;" onclick="closeGuide()">×</button>
+            </div>
+            <div class="guide-content">
+                <div class="guide-card-deck" id="guide-deck">
+                    <!-- Slides injected by JS -->
+                </div>
+            </div>
+            <div class="guide-nav">
+                <button class="btn btn-secondary" style="width:auto; padding:10px 20px;" onclick="prevGuideSlide()">Back</button>
+                <span class="guide-progress" id="guide-progress">1/4</span>
+                <button class="btn btn-primary" style="width:auto; padding:10px 20px;" onclick="nextGuideSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- CHAT OVERLAY -->
+        <div id="chat-overlay" class="chat-overlay">
+            <div class="chat-header">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <div><h2 style="margin:0; font-size:18px;">Ask SARA</h2><p style="margin:0; font-size:12px; color:var(--text-muted);">AI Recovery Assistant</p></div>
+                    <button class="close-chat-btn" style="position:static;" onclick="toggleChat(false)">×</button>
+                </div>
+                <div id="chat-context" class="chat-context-chip" style="display:none;">Context: General</div>
+            </div>
+            <div class="chat-messages" id="chat-history">
+                <div class="message sara">Hi Mike! I'm here to help you get ready for tomorrow.</div>
+            </div>
+            <div class="quick-replies">
+                <div class="quick-reply-pill" onclick="sendMessage('Is this normal?')">Is this normal?</div>
+                <div class="quick-reply-pill" onclick="sendMessage('Contact nurse')">Contact nurse</div>
+                <div class="quick-reply-pill" onclick="sendMessage('Show me the guide')">Show guide</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input-field" placeholder="Type a message..." onkeypress="handleEnter(event)">
+                <button class="btn btn-primary" style="width:40px; height:40px; border-radius:50%; padding:0; flex:none;" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+
+        <!-- FAB (Replaced CSS Mask with SVG) -->
+        <button class="fab-sara" onclick="toggleChat(true)">
+            <svg class="fab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+        </button>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('focus', this)"><div class="nav-icon icon-focus"></div><span>Today</span></div>
+            <div class="nav-item" onclick="switchTab('journey', this)"><div class="nav-icon icon-journey"></div><span>Journey</span></div>
+            <div class="nav-item" onclick="switchTab('library', this)"><div class="nav-icon icon-library"></div><span>Library</span></div>
+        </nav>
+    </div>
+
+    <script>
+        // DATA
+        let steps = [
+            { 
+                id: 101, category: 'learn', label: 'Guide', title: 'Review Anesthesia', 
+                desc: 'Learn exactly what to expect so there are no surprises.', 
+                reason: 'Knowing what sedation feels like reduces fear.', due: '2 min read', 
+                aiPrompt: 'Will I be asleep?', btnPrimary: 'Read Guide', completed: false 
+            },
+            { 
+                id: 102, category: 'check', label: 'Check-in', title: 'Quick Check-in', 
+                desc: 'Let us know how you are feeling about the prep.', 
+                reason: 'Helps us tailor your support.', due: 'Due tonight', 
+                aiPrompt: 'Is nervousness normal?', btnPrimary: 'Start', hasInput: true, completed: false 
+            },
+            { 
+                id: 103, category: 'rest', label: 'Recovery', title: 'Active Rest', 
+                desc: 'Take 20 mins with legs elevated to reduce swelling.', 
+                reason: 'Rest is an active part of healing today.', due: 'Anytime', 
+                aiPrompt: 'Why elevate?', btnPrimary: 'I Rested', completed: false 
+            }
+        ];
+
+        const guideContent = [
+            { title: "What is Sedation?", text: "It feels like a deep nap. You won't feel pain, but you might hear voices." },
+            { title: "Before Surgery", text: "You'll meet your anesthesiologist. They will check your vitals and ask about allergies." },
+            { title: "During Surgery", text: "Monitors will track your heart rate, breathing, and oxygen levels continuously." },
+            { title: "Waking Up", text: "You'll wake up in the recovery room. You might feel groggy, but you are safe." }
+        ];
+
+        // STATE
+        let currentIndex = 0;
+        let isAnimating = false;
+        let guideIndex = 0;
+        let activeGuideId = null;
+
+        // INIT
+        function init() {
+            initTicker();
+            renderDeck();
+        }
+
+        // DECK RENDER
+        function renderDeck() {
+            const container = document.getElementById('card-deck');
+            container.innerHTML = '';
+            isAnimating = false;
+
+            // Only show incomplete steps + "active" index handling
+            const activeSteps = steps.slice(currentIndex);
+
+            if (activeSteps.length === 0) {
+                container.innerHTML = `
+                    <div class="all-set-view">
+                        <div class="done-card">
+                            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+                            <h2 style="font-size:24px; margin:0 0 10px 0;">You're all set!</h2>
+                            <p style="color:var(--text-muted); font-size:15px; margin:0;">Dr. Kaplan's team has received your updates.</p>
+                        </div>
+                        <div class="preview-card">
+                            <div style="background:var(--bg-accent); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🔒</div>
+                            <div>
+                                <div style="font-weight:bold; font-size:14px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Coming Tomorrow</div>
+                                <div style="font-size:14px; color:var(--text-main);">First Shower & Hibiclens</div>
+                            </div>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            for(let i=0; i<Math.min(activeSteps.length, 2); i++) {
+                const step = activeSteps[i];
+                const isTop = i === 0;
+                const cardEl = document.createElement('div');
+                cardEl.className = `card ${isTop ? 'active' : 'next'} ${step.category === 'rest' ? 'rest-card' : ''}`;
+                cardEl.setAttribute('data-type', step.category);
+                
+                let actionArea = '';
+                
+                // Adaptive "Read Guide" logic
+                if(step.category === 'learn') {
+                    actionArea = `
+                        <div class="card-actions" id="actions-${step.id}">
+                            <button class="btn btn-secondary" onclick="toggleReminder()">Remind me</button>
+                            <button class="btn btn-primary" onclick="openGuide(${step.id})">${step.btnPrimary}</button>
+                        </div>
+                        <div class="confidence-check" id="conf-${step.id}">
+                            <p style="text-align:center; font-weight:600; margin-bottom:5px;">Do you feel clear about this?</p>
+                            <button class="confidence-btn" onclick="completeCard(${step.id})">✅ Yes, I'm good</button>
+                            <button class="confidence-btn" onclick="askSaraContext('Explain ${step.title}')">❓ I have a question</button>
+                        </div>`;
+                } else if(step.category === 'support') {
+                    actionArea = `
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="toggleChat(true, 'Support')">Chat Nurse</button>
+                            <button class="btn btn-primary" onclick="alert('Playing Audio...'); completeCard(${step.id});">Play Reset Audio</button>
+                        </div>`;
+                } else {
+                    actionArea = `
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="toggleReminder()">Remind me</button>
+                            <button class="btn btn-primary" onclick="handlePrimaryAction(${step.id})">${step.btnPrimary}</button>
+                        </div>`;
+                }
+
+                cardEl.innerHTML = `
+                    <div class="meta-row">
+                        <div class="tag">${step.label}</div>
+                        <div class="time-anchor">🕒 ${step.due}</div>
+                    </div>
+                    <div class="card-content-scroll">
+                        <h2>${step.title}</h2>
+                        <p class="card-desc">${step.desc}</p>
+                        <div class="why-it-matters">"${step.reason}"</div>
+                    </div>
+                    <div class="ai-prompt" onclick="askSaraContext('${step.aiPrompt}', '${step.title}')">
+                        <div class="ai-avatar">AI</div>
+                        <span class="ai-text">Ask SARA: "${step.aiPrompt}"</span>
+                    </div>
+                    ${actionArea}
+                `;
+                container.appendChild(cardEl);
+            }
+        }
+
+        // GUIDE VIEWER LOGIC
+        function openGuide(id) {
+            activeGuideId = id;
+            guideIndex = 0;
+            renderGuideSlide();
+            document.getElementById('guide-overlay').classList.add('open');
+        }
+        function closeGuide() {
+            document.getElementById('guide-overlay').classList.remove('open');
+            if(activeGuideId) {
+                // Show confidence check on card
+                document.getElementById(`actions-${activeGuideId}`).style.display = 'none';
+                document.getElementById(`conf-${activeGuideId}`).classList.add('visible');
+            }
+        }
+        function renderGuideSlide() {
+            const container = document.getElementById('guide-deck');
+            container.innerHTML = '';
+            const content = guideContent[guideIndex];
+            
+            const slide = document.createElement('div');
+            slide.className = 'guide-slide active';
+            // Removed fixed height, added better content flow
+            slide.innerHTML = `
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="font-size:80px; margin-bottom:30px;">📄</div>
+                    <h2 style="font-size:28px; margin-bottom:20px; text-align:center;">${content.title}</h2>
+                    <div class="guide-text-content">
+                        <p style="font-size:18px; line-height:1.6; color:var(--text-muted); text-align:center;">${content.text}</p>
+                    </div>
+                </div>
+            `;
+            container.appendChild(slide);
+            document.getElementById('guide-progress').innerText = `${guideIndex + 1}/${guideContent.length}`;
+        }
+        function nextGuideSlide() {
+            if(guideIndex < guideContent.length - 1) {
+                guideIndex++;
+                renderGuideSlide();
+            } else {
+                closeGuide();
+            }
+        }
+        function prevGuideSlide() {
+            if(guideIndex > 0) {
+                guideIndex--;
+                renderGuideSlide();
+            }
+        }
+
+        // ACTION HANDLERS
+        function handlePrimaryAction(id) {
+            const step = steps.find(s => s.id === id);
+            if(step.hasInput) openModal();
+            else completeCard(id);
+        }
+
+        function completeCard(id) {
+            const currentCard = document.querySelector('.card.active');
+            if(!currentCard) return;
+            isAnimating = true;
+            
+            const step = steps.find(s => s.id === id);
+            step.completed = true;
+            updateTicker();
+
+            currentCard.classList.add('success');
+            setTimeout(() => {
+                currentCard.classList.add('slide-out-right');
+                setTimeout(() => { currentIndex++; renderDeck(); }, 300);
+            }, 500);
+        }
+
+        // ADAPTIVE CHECK-IN
+        function submitData() {
+            const val = document.getElementById('data-slider').value;
+            closeModal();
+
+            // ADAPTIVE LOGIC: Low confidence triggers support card
+            if(val <= 2) {
+                const supportCard = {
+                    id: 999, category: 'support', label: 'Support', title: 'Let\'s get back on track',
+                    desc: 'It sounds like you\'re feeling unsure. That is okay. Would you like a quick reset or to chat with a human?',
+                    reason: 'Reducing anxiety helps recovery.', due: 'Recommended', aiPrompt: 'I need reassurance', btnPrimary: 'Reset', completed: false
+                };
+                // Insert after current card
+                steps.splice(currentIndex + 1, 0, supportCard);
+                // Refresh ticker to include new step
+                initTicker();
+            } else {
+                showToast("You're doing great! Keep it up.");
+            }
+
+            setTimeout(() => completeCard(steps[currentIndex].id), 300);
+        }
+
+        // CHAT LOGIC
+        function toggleChat(show, context) {
+            const overlay = document.getElementById('chat-overlay');
+            if(show) {
+                overlay.classList.add('open');
+                if(context) {
+                    document.getElementById('chat-context').innerText = `Context: ${context}`;
+                    document.getElementById('chat-context').style.display = 'block';
+                }
+            } else {
+                overlay.classList.remove('open');
+            }
+        }
+
+        function sendMessage(txt) {
+            const inputEl = document.getElementById('chat-input-field');
+            const text = (typeof txt === 'string' ? txt : inputEl.value).trim();
+            if(text) {
+                addMessage(text, 'user');
+                inputEl.value = '';
+                setTimeout(() => respondTo(text), 800);
+            }
+        }
+
+        function respondTo(text) {
+            let html = "I can help with that. For urgent concerns, please tap the Help icon.";
+            const lower = text.toLowerCase();
+            
+            // RAG SIMULATION
+            if(lower.includes('normal') || lower.includes('nausea')) {
+                html = `
+                    <div class="rag-source">Source: Anesthesia Protocol</div>
+                    It is common to feel slight nausea. Protocol suggests small sips of ginger ale.
+                    <div class="rag-quote">"80% of patients report mild anxiety 48h pre-op."</div>
+                    <div class="rag-action" onclick="openGuide(101); toggleChat(false);">
+                        📄 Open Anesthesia Guide
+                    </div>
+                `;
+            } else if (lower.includes('contact') || lower.includes('nurse')) {
+                html = `I can connect you. <br><strong>On-call Nurse:</strong> Sarah J.<br><a href="#" style="color:var(--primary)">Click to call</a>`;
+            }
+            
+            addMessage(html, 'sara');
+        }
+
+        function addMessage(html, type) {
+            const container = document.getElementById('chat-history');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = html;
+            container.appendChild(msg);
+            setTimeout(() => container.scrollTop = container.scrollHeight, 10);
+        }
+
+        // UTILS
+        function initTicker() {
+            const container = document.getElementById('momentum-ticker');
+            container.innerHTML = '';
+            steps.forEach(() => {
+                const seg = document.createElement('div');
+                seg.className = 'ticker-segment';
+                container.appendChild(seg);
+            });
+            updateProgressText();
+        }
+        function updateTicker() {
+            const segs = document.querySelectorAll('.ticker-segment');
+            steps.forEach((step, idx) => {
+                if(step.completed && segs[idx]) segs[idx].classList.add('filled');
+            });
+            updateProgressText();
+        }
+        function updateProgressText() {
+            const completed = steps.filter(s => s.completed).length;
+            if(completed === 0) document.getElementById('progress-text').innerText = `${steps.length} steps • ~6 min`;
+            else document.getElementById('progress-text').innerText = `${completed}/${steps.length} Done`;
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = "✅ " + msg;
+            t.classList.add('visible');
+            setTimeout(() => t.classList.remove('visible'), 3000);
+        }
+        function toggleReminder() {
+            const p = document.getElementById('reminder-popup');
+            p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+        }
+        function snoozeAction(t) {
+            document.getElementById('reminder-popup').style.display = 'none';
+            showToast(`Reminder set for ${t === 'tonight' ? '7:00 PM' : '1 hour'}`);
+            // Logic to move card to end
+            const item = steps[currentIndex];
+            steps.push(steps.splice(currentIndex, 1)[0]);
+            renderDeck();
+        }
+        
+        // Modal Helpers
+        function openModal() { document.getElementById('input-modal').classList.add('open'); }
+        function closeModal() { document.getElementById('input-modal').classList.remove('open'); }
+        function updateEmoji(val) {
+            const labels = ['Unsure', 'Okay', 'Better', 'Confident', 'Ready'];
+            document.getElementById('emoji-display').innerText = ['😟','😐','🙂','😃','💪'][val-1];
+            document.getElementById('slider-label').innerText = labels[val-1];
+        }
+        function askSaraContext(q, c) { toggleChat(true, c); setTimeout(() => sendMessage(q), 200); }
+        function handleEnter(e) { if(e.key==='Enter') sendMessage(); }
+
+        function switchTab(viewName, navEl) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navEl.classList.add('active');
+            ['view-focus', 'view-journey', 'view-library'].forEach(id => document.getElementById(id).style.display = 'none');
+            
+            const viewMap = {
+                'focus': 'view-focus',
+                'journey': 'view-journey',
+                'library': 'view-library'
+            };
+            
+            const viewId = viewMap[viewName];
+            const view = document.getElementById(viewId);
+            if(viewName === 'focus') view.style.display = 'flex'; else view.style.display = 'block';
+        }
+
+        init();
+    </script>
+</body>
+</html>
