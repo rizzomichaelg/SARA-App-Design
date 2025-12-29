@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Patient Recovery Companion</title>
+    <script>
+        try {
+            sessionStorage.removeItem('vapi_widget_expanded');
+        } catch (err) {
+            console.warn('Unable to clear vapi_widget_expanded', err);
+        }
+    </script>
+    <script
+        src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
+        async
+        type="text/javascript"
+    ></script>
+  <script type="module" crossorigin>(function(){const i=document.createElement("link").relList;if(i&&i.supports&&i.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))n(o);new MutationObserver(o=>{for(const s of o)if(s.type==="childList")for(const a of s.addedNodes)a.tagName==="LINK"&&a.rel==="modulepreload"&&n(a)}).observe(document,{childList:!0,subtree:!0});function e(o){const s={};return o.integrity&&(s.integrity=o.integrity),o.referrerPolicy&&(s.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?s.credentials="include":o.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function n(o){if(o.ep)return;o.ep=!0;const s=e(o);fetch(o.href,s)}})();let c=[{id:101,category:"learn",label:"Guide",title:"Review Anesthesia",desc:"Learn exactly what to expect so there are no surprises.",reason:"Knowing what sedation feels like reduces fear.",due:"2 min read",aiPrompt:"Will I be asleep?",btnPrimary:"Read Guide",completed:!1},{id:102,category:"check",label:"Check-in",title:"Quick Check-in",desc:"Let us know how you are feeling about the prep.",reason:"Helps us tailor your support.",due:"Due tonight",aiPrompt:"Is nervousness normal?",btnPrimary:"Start",hasInput:!0,completed:!1},{id:103,category:"rest",label:"Recovery",title:"Active Rest",desc:"Take 20 mins with legs elevated to reduce swelling.",reason:"Rest is an active part of healing today.",due:"Anytime",aiPrompt:"Why elevate?",btnPrimary:"I Rested",completed:!1}];const y=[{title:"What is Sedation?",text:"It feels like a deep nap. You won't feel pain, but you might hear voices."},{title:"Before Surgery",text:"You'll meet your anesthesiologist. They will check your vitals and ask about allergies."},{title:"During Surgery",text:"Monitors will track your heart rate, breathing, and oxygen levels continuously."},{title:"Waking Up",text:"You'll wake up in the recovery room. You might feel groggy, but you are safe."}];let f=0,l=0,v=null;function q(){T(),b()}function b(){const t=document.getElementById("card-deck");t.innerHTML="";const i=c.slice(f);if(i.length===0){t.innerHTML=`
+                    <div class="all-set-view">
+                        <div class="done-card">
+                            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+                            <h2 style="font-size:24px; margin:0 0 10px 0;">You're all set!</h2>
+                            <p style="color:var(--text-muted); font-size:15px; margin:0;">Dr. Kaplan's team has received your updates.</p>
+                        </div>
+                        <div class="preview-card">
+                            <div style="background:var(--bg-accent); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">🔒</div>
+                            <div>
+                                <div style="font-weight:bold; font-size:14px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Coming Tomorrow</div>
+                                <div style="font-size:14px; color:var(--text-main);">First Shower & Hibiclens</div>
+                            </div>
+                        </div>
+                    </div>`;return}for(let e=0;e<Math.min(i.length,2);e++){const n=i[e],o=e===0,s=document.createElement("div");s.className=`card ${o?"active":"next"} ${n.category==="rest"?"rest-card":""}`,s.setAttribute("data-type",n.category);let a="";n.category==="learn"?a=`
+                        <div class="card-actions" id="actions-${n.id}">
+                            <button class="btn btn-secondary" onclick="toggleReminder()">Remind me</button>
+                            <button class="btn btn-primary" onclick="openGuide(${n.id})">${n.btnPrimary}</button>
+                        </div>
+                        <div class="confidence-check" id="conf-${n.id}">
+                            <p style="text-align:center; font-weight:600; margin-bottom:5px;">Do you feel clear about this?</p>
+                            <button class="confidence-btn" onclick="completeCard(${n.id})">✅ Yes, I'm good</button>
+                            <button class="confidence-btn" onclick="askSaraContext('Explain ${n.title}')">❓ I have a question</button>
+                        </div>`:n.category==="support"?a=`
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="toggleChat(true, 'Support')">Chat Nurse</button>
+                            <button class="btn btn-primary" onclick="alert('Playing Audio...'); completeCard(${n.id});">Play Reset Audio</button>
+                        </div>`:a=`
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="toggleReminder()">Remind me</button>
+                            <button class="btn btn-primary" onclick="handlePrimaryAction(${n.id})">${n.btnPrimary}</button>
+                        </div>`,s.innerHTML=`
+                    <div class="meta-row">
+                        <div class="tag">${n.label}</div>
+                        <div class="time-anchor">🕒 ${n.due}</div>
+                    </div>
+                    <div class="card-content-scroll">
+                        <h2>${n.title}</h2>
+                        <p class="card-desc">${n.desc}</p>
+                        <div class="why-it-matters">"${n.reason}"</div>
+                    </div>
+                    <div class="ai-prompt" onclick="askSaraContext('${n.aiPrompt}', '${n.title}')">
+                        <div class="ai-avatar">AI</div>
+                        <span class="ai-text">Ask SARA: "${n.aiPrompt}"</span>
+                    </div>
+                    ${a}
+                `,t.appendChild(s)}}function C(t){v=t,l=0,w(),document.getElementById("guide-overlay").classList.add("open")}function S(){document.getElementById("guide-overlay").classList.remove("open"),v&&(document.getElementById(`actions-${v}`).style.display="none",document.getElementById(`conf-${v}`).classList.add("visible"))}function w(){const t=document.getElementById("guide-deck");t.innerHTML="";const i=y[l],e=i.text.split(".").map(r=>r.trim()).filter(Boolean),n=e.shift()||i.text.trim(),o=n?`${n}${n.endsWith(".")?"":"."}`:"",s=e.length?`<ul class="guide-points">${e.map(r=>`<li>${r}${r.endsWith(".")?"":"."}</li>`).join("")}</ul>`:"",a=document.createElement("div");a.className="guide-slide active",a.innerHTML=`
+                <div class="guide-step-pill">Section ${l+1} of ${y.length}</div>
+                <div class="guide-hero">
+                    <div class="guide-icon-wrap"><span class="guide-icon">${l+1}</span></div>
+                    <div class="guide-hero-text">
+                        <h2 class="guide-title">${i.title}</h2>
+                        <p class="guide-lede">${o}</p>
+                    </div>
+                </div>
+                ${s}
+            `,t.appendChild(a),document.getElementById("guide-progress").innerText=`${l+1}/${y.length}`}function R(){l<y.length-1?(l++,w()):S()}function V(){l>0&&(l--,w())}function A(t){c.find(e=>e.id===t).hasInput?W():x(t)}function x(t){const i=document.querySelector(".card.active");if(!i)return;const e=c.find(n=>n.id===t);e.completed=!0,H(),i.classList.add("success"),setTimeout(()=>{i.classList.add("slide-out-right"),setTimeout(()=>{f++,b()},300)},500)}function M(){const t=document.getElementById("data-slider").value;if(I(),t<=2){const i={id:999,category:"support",label:"Support",title:"Let's get back on track",desc:"It sounds like you're feeling unsure. That is okay. Would you like a quick reset or to chat with a human?",reason:"Reducing anxiety helps recovery.",due:"Recommended",aiPrompt:"I need reassurance",btnPrimary:"Reset",completed:!1};c.splice(f+1,0,i),T()}else P("You're doing great! Keep it up.");setTimeout(()=>x(c[f].id),300)}function $(t,i){if(!i)return;const{context:e,question:n}=i;!e&&!n||(t.dataset.vapiContext=e||"",t.dataset.vapiQuestion=n||"")}let g=null,d=null,u=0;const D=8e3;function O(t){t&&(g=t,h())}function E(t){return t?t.shadowRoot||t:null}function h(){var a,r,p,m;if(!g)return!1;const t=document.getElementById("chat-overlay");if(!t||!t.classList.contains("open"))return!1;const i=t.querySelector("vapi-widget");if(!i)return!1;const e=E(i),n=(a=e==null?void 0:e.querySelector)==null?void 0:a.call(e,'input[type="text"]');if(!n||n.disabled)return!1;const o=g;g=null,n.value=o,n.dispatchEvent(new Event("input",{bubbles:!0})),n.focus();const s=((r=e==null?void 0:e.querySelector)==null?void 0:r.call(e,'button[title="Send message"]'))||((p=e==null?void 0:e.querySelector)==null?void 0:p.call(e,'button[aria-label="Send message"]'))||((m=e==null?void 0:e.querySelector)==null?void 0:m.call(e,'button[type="submit"]'));return s&&!s.disabled?(s.click(),!0):(n.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",code:"Enter",bubbles:!0})),n.dispatchEvent(new KeyboardEvent("keypress",{key:"Enter",code:"Enter",bubbles:!0})),n.dispatchEvent(new KeyboardEvent("keyup",{key:"Enter",code:"Enter",bubbles:!0})),!0)}function L(t=D){var a,r,p;const i=document.getElementById("chat-overlay");if(!i||!i.classList.contains("open"))return;const e=i.querySelector("vapi-widget");if(!e)return;const n=E(e);if((!u||Date.now()>u)&&(u=Date.now()+t),(a=n==null?void 0:n.querySelector)==null?void 0:a.call(n,".vapi-conversation-area")){e.classList.add("is-expanded"),u=0,d&&clearTimeout(d);const m=(r=n==null?void 0:n.querySelector)==null?void 0:r.call(n,'input[type="text"]');m&&m.focus(),h();return}e.classList.remove("is-expanded");const s=(p=n==null?void 0:n.querySelector)==null?void 0:p.call(n,".vapi-widget-wrapper > div > div");s&&s.click(),Date.now()<u&&(d&&clearTimeout(d),d=setTimeout(()=>L(0),250))}function G(){const t=document.getElementById("chat-overlay"),i=t==null?void 0:t.querySelector("vapi-widget");if(!t||!i||!window.MutationObserver)return;const e=E(i)||i;new MutationObserver(()=>{var s;if(!t.classList.contains("open"))return;if((s=e==null?void 0:e.querySelector)==null?void 0:s.call(e,".vapi-conversation-area")){i.classList.add("is-expanded"),h();return}i.classList.remove("is-expanded"),L(2e3)}).observe(e,{childList:!0,subtree:!0})}function k(t,i){const e=document.getElementById("chat-overlay");if(!e)return;const n=document.querySelector(".phone-frame"),o=document.documentElement;if(t){n&&n.classList.add("chat-open"),o&&o.classList.add("chat-open"),e.classList.add("open");const s=e.querySelector("vapi-widget");s&&$(s,{context:i}),I();try{sessionStorage.setItem("vapi_widget_expanded","true")}catch(a){console.warn("[Vapi] Failed to persist expanded state:",a)}L(),h()}else{e.classList.remove("open"),n&&n.classList.remove("chat-open"),o&&o.classList.remove("chat-open");const s=e.querySelector("vapi-widget");s&&s.classList.remove("is-expanded");try{sessionStorage.removeItem("vapi_widget_expanded")}catch(a){console.warn("[Vapi] Failed to clear expanded state:",a)}u=0,d&&clearTimeout(d)}}function T(){const t=document.getElementById("momentum-ticker");t.innerHTML="",c.forEach(()=>{const i=document.createElement("div");i.className="ticker-segment",t.appendChild(i)}),B()}function H(){const t=document.querySelectorAll(".ticker-segment");c.forEach((i,e)=>{i.completed&&t[e]&&t[e].classList.add("filled")}),B()}function B(){const t=c.filter(i=>i.completed).length;t===0?document.getElementById("progress-text").innerText=`${c.length} steps • ~6 min`:document.getElementById("progress-text").innerText=`${t}/${c.length} Done`}function P(t){const i=document.getElementById("toast");i.innerText="✅ "+t,i.classList.add("visible"),setTimeout(()=>i.classList.remove("visible"),3e3)}function j(){const t=document.getElementById("reminder-popup");t.style.display=t.style.display==="flex"?"none":"flex"}function K(){document.getElementById("reminder-popup").style.display="none"}function N(t){document.getElementById("reminder-popup").style.display="none",P(`Reminder set for ${t==="tonight"?"7:00 PM":"1 hour"}`),c.push(c.splice(f,1)[0]),b()}function W(){const t=document.getElementById("chat-overlay");if(t!=null&&t.classList.contains("open"))return;const i=document.getElementById("input-modal");i&&i.classList.add("open")}function I(){const t=document.getElementById("input-modal");t&&t.classList.remove("open")}function Y(t){const i=["Unsure","Okay","Better","Confident","Ready"];document.getElementById("emoji-display").innerText=["😟","😐","🙂","😃","💪"][t-1],document.getElementById("slider-label").innerText=i[t-1]}function z(t,i){const e=document.getElementById("chat-overlay");if(!e)return;k(!0,i);const n=e.querySelector("vapi-widget");n&&$(n,{context:i,question:t}),O(t)}function _(t,i){document.querySelectorAll(".nav-item").forEach(s=>s.classList.remove("active")),i.classList.add("active"),["view-focus","view-journey","view-library"].forEach(s=>document.getElementById(s).style.display="none");const n={focus:"view-focus",journey:"view-journey",library:"view-library"}[t],o=document.getElementById(n);t==="focus"?o.style.display="flex":o.style.display="block"}const Q=()=>{const t=document.querySelector("vapi-widget");t&&(t.addEventListener("call-start",()=>{console.log("[Vapi] call-start")}),t.addEventListener("call-end",()=>{console.log("[Vapi] call-end")}),t.addEventListener("message",i=>{console.log("[Vapi] message",i.detail)}),t.addEventListener("error",i=>{const e=i.detail||{};console.error("[Vapi] error",e),e!=null&&e.message&&console.error("[Vapi] message",e.message),e!=null&&e.status&&console.error("[Vapi] status",e.status),e!=null&&e.code&&console.error("[Vapi] code",e.code),e!=null&&e.type&&console.error("[Vapi] type",e.type),e!=null&&e.response&&console.error("[Vapi] response",e.response);const n=(e==null?void 0:e.error)instanceof Response?e.error:(e==null?void 0:e.response)instanceof Response?e.response:null;n&&n.clone().text().then(o=>{o&&console.error("[Vapi] response body",o)}).catch(o=>{console.error("[Vapi] response read error",o)}),e!=null&&e.message&&e.message.includes("microphone")&&alert("Please allow microphone access to use voice features.")}))},F=()=>{Object.assign(window,{openGuide:C,closeGuide:S,nextGuideSlide:R,prevGuideSlide:V,toggleChat:k,switchTab:_,toggleReminder:j,closeReminder:K,snoozeAction:N,submitData:M,updateEmoji:Y,askSaraContext:z,handlePrimaryAction:A,completeCard:x,closeModal:I})};window.addEventListener("DOMContentLoaded",()=>{F(),q(),Q(),G(),k(!1)});</script>
+  <style rel="stylesheet" crossorigin>:root{--bg-dark: #0f172a;--bg-card: #1e293b;--bg-accent: #334155;--col-do: #38bdf8;--col-learn: #818cf8;--col-check: #2dd4bf;--col-rest: #34d399;--col-support: #f472b6;--success: #10b981;--urgent: #f59e0b;--primary: #38bdf8;--text-main: #f1f5f9;--text-muted: #94a3b8;--shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);--shadow-card: 0 20px 25px -5px rgba(0, 0, 0, .3), 0 10px 10px -5px rgba(0, 0, 0, .2);--gradient-sara: linear-gradient(135deg, #38bdf8, #818cf8)}*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background-color:#020617;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text-main)}.phone-frame{width:375px;height:812px;background-color:var(--bg-dark);border-radius:40px;box-shadow:0 0 0 12px #1e293b,0 20px 50px #000c;position:relative;overflow:hidden;display:flex;flex-direction:column}.notch{position:absolute;top:0;left:50%;transform:translate(-50%);width:150px;height:30px;background-color:#1e293b;border-bottom-left-radius:16px;border-bottom-right-radius:16px;z-index:100}header{padding:50px 20px 15px;background:#0f172af2;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);z-index:10;display:flex;flex-direction:column;gap:12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.05)}.header-top{display:flex;justify-content:space-between;align-items:flex-start}.greeting h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.5px;line-height:1.2}.greeting p{color:var(--text-muted);font-size:13px;margin:4px 0 0}.calm-btn{background:#ffffff14;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--text-main);display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .2s}.calm-btn:active{background:#ffffff26;transform:scale(.95)}.help-icon{width:36px;height:36px;border-radius:50%;background:#ffffff14;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}.profile-avatar{width:36px;height:36px;background:#334155;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.1)}.progress-container{display:flex;align-items:center;gap:10px;margin-top:5px}.progress-text{font-size:11px;font-weight:600;color:var(--text-muted);min-width:80px;letter-spacing:.5px}.momentum-ticker{flex:1;display:flex;gap:4px;height:4px;background:#ffffff0d;border-radius:2px}.ticker-segment{height:100%;flex:1;background:var(--bg-accent);border-radius:2px;transition:all .5s ease;opacity:.3}.ticker-segment.filled{background:var(--success);box-shadow:0 0 10px #10b98180;opacity:1}.journey-stepper{display:flex;justify-content:space-between;position:relative;margin-top:5px;padding:0 12px}.journey-line{position:absolute;top:14px;left:25px;right:25px;height:2px;background:var(--bg-accent);z-index:0}.step-node{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;cursor:pointer;opacity:.5;transition:all .2s}.step-node.active{opacity:1}.step-circle{width:28px;height:28px;border-radius:50%;background:var(--bg-card);border:2px solid var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-muted);transition:all .2s}.step-node.active .step-circle{border-color:var(--primary);background:var(--bg-dark);color:var(--primary);box-shadow:0 0 0 4px #38bdf826;transform:scale(1.1)}.step-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}main{flex:1;position:relative;overflow-y:auto;padding-bottom:120px;scrollbar-width:none}main::-webkit-scrollbar{display:none}.focus-view{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px}.deck-container{width:100%;height:500px;position:relative;perspective:1000px;margin-top:10px;overflow:visible}.card{width:100%;height:100%;background:var(--bg-card);border-radius:24px;padding:24px;position:absolute;top:0;left:0;transition:all .4s cubic-bezier(.25,.8,.25,1);box-shadow:var(--shadow-card);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;border-left-width:6px;border-left-style:solid}.card[data-type=do]{border-left-color:var(--col-do)}.card[data-type=learn]{border-left-color:var(--col-learn)}.card[data-type=check]{border-left-color:var(--col-check)}.card[data-type=rest]{border-left-color:var(--col-rest)}.card[data-type=support]{border-left-color:var(--col-support);background:linear-gradient(#f472b60d,#f472b60d),var(--bg-card)}.card.active{z-index:10;transform:translateY(0) scale(1);opacity:1}.card.next{z-index:5;transform:translateY(15px) scale(.95);opacity:.6;filter:blur(2px)}.card.success{border-color:var(--success);background:linear-gradient(#10b98126,#10b98126),var(--bg-card);border-left-color:var(--success);box-shadow:0 0 40px #10b98133}.meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0}.tag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;border-radius:6px}.card[data-type=do] .tag{color:var(--col-do);background:#38bdf826}.card[data-type=learn] .tag{color:var(--col-learn);background:#818cf826}.card[data-type=check] .tag{color:var(--col-check);background:#fbbf2426}.card[data-type=rest] .tag{color:var(--col-rest);background:#34d39926}.card[data-type=support] .tag{color:var(--col-support);background:#f472b626}.time-anchor{font-size:12px;color:var(--text-muted);font-weight:600;display:flex;align-items:center;gap:4px}.card-content-scroll{flex:1;overflow-y:auto;margin-bottom:16px;padding-right:4px}.card h2{font-size:26px;margin:0 0 10px;line-height:1.1;font-weight:700}.card-desc{color:var(--text-muted);font-size:16px;line-height:1.5;margin:0 0 16px}.why-it-matters{background:#ffffff08;border-left:2px solid var(--text-muted);padding:12px 14px;font-size:13px;color:var(--text-main);font-style:italic;border-radius:0 8px 8px 0;margin-bottom:10px}.ai-prompt{border:1px solid rgba(255,255,255,.1);background:#ffffff05;border-radius:30px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;margin-top:auto;flex-shrink:0;transition:background .2s}.ai-prompt:active{background:#ffffff14}.ai-text{font-size:12px;color:var(--primary);font-weight:600}.card-actions{display:flex;gap:12px;margin-top:16px;flex-shrink:0}.btn{padding:16px 12px;border-radius:16px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:transform .1s;display:flex;align-items:center;justify-content:center;white-space:nowrap}.btn:active{transform:scale(.97)}.btn-primary{background:var(--primary);color:#0f172a;flex:1.5;box-shadow:0 4px 12px #38bdf84d}.btn-secondary{background:#ffffff0d;color:#fff;border:1px solid rgba(255,255,255,.1);flex:1}.btn-secondary:hover{background:#ffffff1a}.confidence-check{display:none;flex-direction:column;gap:10px;margin-top:16px;flex-shrink:0}.confidence-check.visible{display:flex;animation:fadeIn .3s ease}.confidence-btn{padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#ffffff0d;color:#fff;font-size:14px;cursor:pointer;text-align:left;transition:background .2s}.confidence-btn:active{background:#ffffff1a}.journey-view{padding:20px 24px;display:none}.timeline-section-title{font-size:14px;font-weight:700;color:var(--primary);margin:24px 0 16px;text-transform:uppercase;letter-spacing:1px}.timeline-section-title:first-child{margin-top:0}.timeline-item{display:flex;gap:16px;margin-bottom:24px;position:relative}.timeline-line{position:absolute;left:7px;top:24px;bottom:-30px;width:2px;background:var(--bg-accent);z-index:0}.timeline-item:last-child .timeline-line{display:none}.status-dot{width:16px;height:16px;border-radius:50%;background:var(--bg-card);border:2px solid var(--text-muted);z-index:1;margin-top:4px;flex-shrink:0}.status-dot.active{background:var(--primary);border-color:var(--primary);box-shadow:0 0 0 4px #38bdf833}.status-dot.done{background:var(--success);border-color:var(--success)}.timeline-content{flex:1;background:var(--bg-card);padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.05)}.timeline-date{font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block;font-weight:500}.timeline-title{margin:0;font-size:16px;font-weight:600}.library-view{padding:20px;display:none}.library-search{background:var(--bg-card);border:1px solid rgba(255,255,255,.1);width:100%;padding:14px 16px;border-radius:12px;color:#fff;margin-bottom:24px;font-size:14px}.library-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.asset-card{background:var(--bg-card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,.05);transition:transform .2s}.asset-card:active{transform:scale(.98);background:#ffffff0d}.asset-icon{width:40px;height:40px;border-radius:10px;background:#ffffff0d;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px}.asset-title{font-size:14px;font-weight:600;line-height:1.3}.asset-meta{font-size:11px;color:var(--text-muted);margin-top:4px}.all-set-view{width:100%;display:flex;flex-direction:column;gap:16px;animation:fadeIn .5s ease;padding-bottom:40px}.done-card{background:var(--bg-card);border-radius:24px;padding:40px 20px;text-align:center;border:1px solid rgba(255,255,255,.08)}.preview-card{background:#1e293b99;border-radius:20px;padding:20px;display:flex;gap:15px;align-items:center;border:2px dashed rgba(255,255,255,.15)}.chat-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--bg-dark);z-index:500;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.25,.8,.25,1)}.chat-overlay.open{transform:translateY(0)}.phone-frame.chat-open>*:not(.chat-overlay){pointer-events:none}.vapi-embed{flex:1;position:relative;padding:0 12px 12px;overflow:visible;z-index:1}.vapi-embed vapi-widget{display:block;width:100%;height:100%}.vapi-embed .vapi-widget-wrapper,.vapi-embed .vapi-widget-wrapper>div{width:100%;height:100%}.vapi-embed .vapi-widget-wrapper{position:absolute!important;top:0!important;right:0!important;bottom:0!important;left:0!important}.vapi-embed .vapi-widget-wrapper>div{position:absolute!important;top:0!important;right:0!important;bottom:0!important;left:0!important}.vapi-embed vapi-widget.is-expanded .vapi-widget-wrapper>div>div>:first-child{display:none!important}.vapi-embed .vapi-widget-wrapper>div>div{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}.chat-header{padding:50px 20px 16px;background:var(--bg-card);display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;position:relative;z-index:2}.chat-header>div{display:flex;flex-direction:column;gap:4px}.chat-context-chip{font-size:11px;background:#38bdf826;color:var(--primary);padding:4px 8px;border-radius:4px;align-self:flex-start}.close-chat-btn{position:static;background:#ffffff14;border:none;color:#fff;font-size:24px;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;flex-shrink:0}.chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;min-height:0}.message{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.5;position:relative;flex-shrink:0}.message.sara{background:var(--bg-card);color:var(--text-main);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid rgba(255,255,255,.05)}.message.user{background:var(--primary);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;font-weight:600;box-shadow:0 2px 8px #38bdf833}.rag-source{display:inline-block;font-size:10px;color:var(--primary);background:#38bdf81a;padding:2px 6px;border-radius:4px;margin-bottom:6px;border:1px solid rgba(56,189,248,.2)}.rag-quote{border-left:2px solid var(--primary);padding-left:8px;color:var(--text-muted);font-style:italic;margin:8px 0;font-size:13px}.rag-action{margin-top:8px;background:#ffffff0d;border:1px solid rgba(255,255,255,.1);padding:8px 12px;border-radius:8px;font-size:12px;color:var(--text-main);cursor:pointer;display:inline-flex;align-items:center;gap:6px}.rag-action:hover{background:#ffffff1a}.quick-replies{display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}.quick-reply-pill{white-space:nowrap;background:#ffffff1a;border-radius:15px;padding:8px 14px;font-size:12px;color:var(--text-main);cursor:pointer;border:1px solid rgba(255,255,255,.05)}.chat-input-area{padding:16px 16px 40px;background:var(--bg-card);border-top:1px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-shrink:0}.chat-input{flex:1;background:#0003;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:12px 16px;color:#fff;font-size:14px}.guide-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--bg-dark);z-index:400;display:flex;flex-direction:column;transform:translate(100%);transition:transform .3s ease}.guide-overlay.open{transform:translate(0)}.guide-header{padding:50px 20px 20px;background:var(--bg-card);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}.guide-content{flex:1;padding:20px;overflow-y:auto;position:relative}.guide-card-deck{height:100%;position:relative}.guide-slide{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#1e293bf5,#0f172afa);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:18px;opacity:0;transform:translate(50px);transition:all .3s ease;pointer-events:none;overflow-y:auto;border:1px solid rgba(255,255,255,.08);border-top:3px solid rgba(56,189,248,.9);box-shadow:0 20px 40px #02061780}.guide-slide.active{opacity:1;transform:translate(0);pointer-events:auto}.guide-step-pill{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary);background:#38bdf81f;border:1px solid rgba(56,189,248,.25);padding:6px 10px;border-radius:999px}.guide-hero{display:flex;align-items:center;gap:14px}.guide-icon-wrap{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#38bdf8e6,#818cf8e6);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 20px #38bdf840;flex-shrink:0}.guide-icon{font-size:20px;font-weight:800;color:#0f172a}.guide-hero-text{flex:1}.guide-title{margin:0 0 6px;font-size:22px;font-weight:700}.guide-lede{margin:0;color:var(--text-muted);font-size:15px;line-height:1.5}.guide-points{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}.guide-points li{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:#ffffff08;font-size:14px;line-height:1.5;color:var(--text-main)}.guide-points li:before{content:"";width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 4px #38bdf826;flex-shrink:0}.guide-nav{padding:20px 20px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;z-index:10}.guide-progress{font-size:12px;color:var(--text-muted)}.input-modal{position:absolute;bottom:0;left:0;width:100%;height:60%;background:var(--bg-card);border-top-left-radius:30px;border-top-right-radius:30px;z-index:300;transform:translateY(110%);transition:transform .3s cubic-bezier(.175,.885,.32,1.275);padding:30px;display:flex;flex-direction:column;align-items:center;box-shadow:0 -10px 40px #00000080;border-top:1px solid rgba(255,255,255,.1)}.input-modal.open{transform:translateY(0)}.phone-frame.chat-open .input-modal{transform:translateY(110%);pointer-events:none}.chat-open #input-modal{display:none!important}.slider-container{width:100%;margin:30px 0;text-align:center;position:relative;padding:0 10px}input[type=range]{-webkit-appearance:none;width:100%;height:12px;border-radius:6px;background:linear-gradient(to right,var(--urgent),var(--col-check),var(--success));outline:none;margin:0}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:32px;height:32px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 10px #00000080;border:4px solid var(--bg-card);margin-top:-2px}.slider-labels{display:flex;justify-content:space-between;width:100%;margin-top:10px;padding:0 5px;color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase}.fab-sara{position:absolute;bottom:100px;right:20px;width:56px;height:56px;border-radius:28px;background:var(--gradient-sara);border:none;box-shadow:0 4px 15px #6366f166;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;transition:transform .2s}.fab-sara:active{transform:scale(.95)}.fab-icon-svg{width:32px;height:32px;color:#fff}nav{position:absolute;bottom:0;width:100%;height:80px;background:#0f172af2;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-around;align-items:center;z-index:200;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-muted);font-size:10px;cursor:pointer;width:70px;transition:color .2s}.nav-item.active{color:var(--primary)}.nav-icon{width:24px;height:24px;background-color:currentColor;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;transition:background-color .2s}.icon-focus{-webkit-mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>')}.icon-journey{-webkit-mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>')}.icon-library{-webkit-mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>')}.slide-out-right{transform:translate(400px) rotate(10deg)!important;opacity:0!important}.slide-out-left{transform:translate(-400px) rotate(-10deg)!important;opacity:0!important}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}.toast{position:absolute;top:120px;left:50%;transform:translate(-50%) translateY(-20px);background:#10b981;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;box-shadow:0 4px 12px #0000004d;opacity:0;pointer-events:none;transition:all .3s ease;z-index:500;display:flex;align-items:center;gap:8px}.toast.visible{opacity:1;transform:translate(-50%) translateY(0)}.reminder-popup{position:absolute;bottom:90px;left:20px;right:20px;background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px;display:none;flex-direction:column;gap:8px;box-shadow:0 10px 40px #00000080;z-index:100}.reminder-popup.open{display:flex;animation:fadeIn .2s ease}.reminder-header{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 6px}.reminder-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}.reminder-close{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:#ffffff0d;color:var(--text-main);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}.reminder-close:active{background:#ffffff1f}.reminder-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;font-size:15px;font-weight:600;line-height:1.3;color:var(--text-main);background:#ffffff08;border:1px solid rgba(255,255,255,.06)}.reminder-opt span{font-size:18px}.reminder-opt:active{background:#ffffff14}</style>
+</head>
+
+<body>
+
+    <div class="phone-frame">
+        <div class="notch"></div>
+
+        <header>
+            <div class="header-top">
+                <div class="greeting">
+                    <h1 id="header-title">Day 2 Before Surgery</h1>
+                    <div class="progress-container">
+                        <span class="progress-text" id="progress-text">3 steps • ~6 min</span>
+                        <div class="momentum-ticker" id="momentum-ticker"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="calm-btn" onclick="alert('Playing 60s Breathing Audio...')">
+                        <span style="font-size:14px;">☁️</span> 60s Reset
+                    </div>
+                    <div class="profile-avatar">MR</div>
+                </div>
+            </div>
+
+            <div class="journey-stepper">
+                <div class="journey-line"></div>
+                <div class="step-node active">
+                    <div class="step-circle">✔</div>
+                    <div class="step-label">Pre-Op</div>
+                </div>
+                <div class="step-node active">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" style="color: var(--primary);">Surgery</div>
+                </div>
+                <div class="step-node">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Recovery</div>
+                </div>
+            </div>
+        </header>
+
+        <div id="toast" class="toast">✅ Reminder set for 7:00 PM</div>
+
+        <main>
+            <div id="view-focus" class="focus-view">
+                <div class="deck-container" id="card-deck"></div>
+            </div>
+
+            <div id="view-journey" class="journey-view" style="display:none;">
+                <div class="timeline-section-title">Completed</div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot done"></div>
+                    <div class="timeline-content" style="opacity: 0.7;">
+                        <span class="timeline-date">Oct 12</span>
+                        <h3 class="timeline-title">Medical Clearance</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Lab results reviewed.</p>
+                    </div>
+                </div>
+                <div class="timeline-section-title">Today</div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot active"></div>
+                    <div class="timeline-content"
+                        style="border:1px solid var(--primary); background: rgba(56, 189, 248, 0.05);">
+                        <span class="timeline-date">Today</span>
+                        <h3 class="timeline-title">Pre-Op Guidelines</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Complete your 3 daily steps.
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-section-title">Upcoming</div>
+                <div class="timeline-item">
+                    <div class="timeline-line"></div>
+                    <div class="status-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">Oct 25</span>
+                        <h3 class="timeline-title">Surgery Day</h3>
+                        <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">Arrival at 6:00 AM.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-library" class="library-view" style="display:none;">
+                <input type="text" class="library-search" placeholder="Search guides, videos...">
+                <h3
+                    style="font-size:14px; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">
+                    Pinned</h3>
+                <div class="asset-card" style="flex-direction:row; align-items:center;">
+                    <div class="asset-icon"
+                        style="background: rgba(244, 114, 182, 0.1); color: #f472b6; margin-right: 8px;">▶</div>
+                    <div>
+                        <div class="asset-title">How to Wash</div>
+                        <div class="asset-meta">Required for tonight</div>
+                    </div>
+                </div>
+                <h3
+                    style="font-size:14px; margin:24px 0 12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">
+                    All Resources</h3>
+                <div class="library-grid">
+                    <div class="asset-card">
+                        <div class="asset-icon"
+                            style="margin-bottom:10px; background: rgba(96, 165, 250, 0.1); color: #60a5fa;">PDF</div>
+                        <div class="asset-title">Anesthesia Guide</div>
+                        <div class="asset-meta">3 min read</div>
+                    </div>
+                    <div class="asset-card">
+                        <div class="asset-icon"
+                            style="margin-bottom:10px; background: rgba(52, 211, 153, 0.1); color: #34d399;">PDF</div>
+                        <div class="asset-title">Wound Care</div>
+                        <div class="asset-meta">Instructions</div>
+                    </div>
+                    <div class="asset-card">
+                        <div class="asset-icon"
+                            style="margin-bottom:10px; background: rgba(251, 191, 36, 0.1); color: #fbbf24;">📝</div>
+                        <div class="asset-title">Pain Log</div>
+                        <div class="asset-meta">Tracker</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- REMINDERS -->
+        <div id="reminder-popup" class="reminder-popup">
+            <div class="reminder-header">
+                <div class="reminder-title">Remind me</div>
+                <button class="reminder-close" onclick="closeReminder()" aria-label="Close reminder menu">×</button>
+            </div>
+            <div class="reminder-opt" onclick="snoozeAction('1hr')">In 1 hour <span>⏰</span></div>
+            <div class="reminder-opt" onclick="snoozeAction('tonight')">Tonight (7 PM) <span>🌙</span></div>
+            <div class="reminder-opt" onclick="snoozeAction('tomorrow')">Tomorrow Morning <span>☀️</span></div>
+        </div>
+
+        <!-- INPUT MODAL (CHECK-IN) -->
+        <div id="input-modal" class="input-modal">
+            <h2 style="margin:0;">Quick Check-in</h2>
+            <p style="color:var(--text-muted); margin-bottom:30px;">How confident do you feel about the plan?</p>
+            <div id="emoji-display" style="font-size:60px; margin-bottom:10px;">😐</div>
+            <p id="slider-label" style="color:var(--primary); font-size:14px; font-weight:bold;">Somewhat Confident</p>
+            <div class="slider-container">
+                <input type="range" min="1" max="5" value="3" id="data-slider" oninput="updateEmoji(this.value)">
+                <div class="slider-labels"><span>Unsure</span><span>Ready</span></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="submitData()">Save</button>
+            <button class="btn btn-secondary" style="width:100%; margin-top:10px; background:none;"
+                onclick="closeModal()">Cancel</button>
+        </div>
+
+        <!-- GUIDE VIEWER OVERLAY -->
+        <div id="guide-overlay" class="guide-overlay">
+            <div class="guide-header">
+                <div>
+                    <h2 style="margin:0; font-size:18px;">Anesthesia Guide</h2>
+                </div>
+                <button class="close-chat-btn" style="position:static; width:30px;" onclick="closeGuide()">×</button>
+            </div>
+            <div class="guide-content">
+                <div class="guide-card-deck" id="guide-deck">
+                    <!-- Slides injected by JS -->
+                </div>
+            </div>
+            <div class="guide-nav">
+                <button class="btn btn-secondary" style="width:auto; padding:10px 20px;"
+                    onclick="prevGuideSlide()">Back</button>
+                <span class="guide-progress" id="guide-progress">1/4</span>
+                <button class="btn btn-primary" style="width:auto; padding:10px 20px;"
+                    onclick="nextGuideSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- CHAT OVERLAY -->
+        <div id="chat-overlay" class="chat-overlay">
+            <div class="chat-header">
+                <div>
+                    <h2 style="margin:0; font-size:18px;">Ask SARA</h2>
+                    <p style="margin:0; font-size:12px; color:var(--text-muted);">AI Recovery Assistant</p>
+                </div>
+                <button class="close-chat-btn" type="button" onclick="toggleChat(false)">×</button>
+            </div>
+            <div class="vapi-embed">
+                <vapi-widget
+                    public-key="870ffb72-c038-4f0e-ba83-e2e4eefc3e96"
+                    assistant-id="e595d05f-6136-41d9-acfe-27a9559c4385"
+                    mode="hybrid"
+                    theme="dark"
+                    size="full"
+                    position="bottom-right"
+                    radius="large"
+                    voice-show-transcript="true"
+                    show-transcript="true"
+                    base-color="#0f172a"
+                    accent-color="#38bdf8"
+                    button-base-color="#1e293b"
+                    button-accent-color="#f1f5f9"
+                    main-label="Ask SARA (ACL)"
+                    empty-chat-message="Ask me anything about your ACL surgery instructions."
+                    require-consent="true"
+                    terms-content="Demo only. Not medical advice. If you have urgent symptoms, contact your surgeon or emergency services."
+                    local-storage-key="sara_acl_widget_consent"
+                ></vapi-widget>
+            </div>
+        </div>
+
+        <!-- FAB (Replaced CSS Mask with SVG) -->
+        <button class="fab-sara" onclick="toggleChat(true)">
+            <svg class="fab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+        </button>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('focus', this)">
+                <div class="nav-icon icon-focus"></div><span>Today</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('journey', this)">
+                <div class="nav-icon icon-journey"></div><span>Journey</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('library', this)">
+                <div class="nav-icon icon-library"></div><span>Library</span>
+            </div>
+        </nav>
+    </div>
+
+</body>
+
+</html>
