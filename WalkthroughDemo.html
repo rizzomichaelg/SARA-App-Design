@@ -1,0 +1,2882 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SARA ACL Demo - Standalone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef3f8;
+      --panel: #ffffff;
+      --ink: #0f172a;
+      --muted: #5b667a;
+      --line: #d8e1ee;
+      --blue: #0ea5e9;
+      --blue-dark: #0284c7;
+      --green: #0f766e;
+      --amber: #92400e;
+      --chip: #e8f2ff;
+      --shadow: 0 16px 36px rgba(15, 23, 42, 0.11);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 420px at 100% -10%, rgba(14, 165, 233, 0.17), transparent 55%),
+        radial-gradient(700px 320px at -15% 10%, rgba(16, 185, 129, 0.12), transparent 55%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1400px, 96vw);
+      margin: 18px auto 24px;
+      display: grid;
+      grid-template-columns: 1fr 370px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .top {
+      padding: 14px 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .headline h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .chips, .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button, select, input, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .chip.active {
+      background: var(--chip);
+      border-color: #9fccff;
+      color: #11457e;
+      font-weight: 600;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .tab.active {
+      background: #f0f9ff;
+      border-color: #8edbff;
+      color: #075985;
+      font-weight: 650;
+    }
+
+    .today-wrap {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .today-hero {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .today-hero.highlight {
+      border-color: #5ebeff;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+    }
+
+    .hero-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .persona {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid #9cd7ff;
+      background: #e8f6ff;
+      color: #075985;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      padding: 10px 13px;
+      font-weight: 600;
+      transition: all 150ms ease;
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(2, 132, 199, 0.27);
+    }
+
+    .btn.primary:hover { background: var(--blue-dark); }
+
+    .btn.ghost {
+      background: #fff;
+      border-color: var(--line);
+      color: #0f395d;
+    }
+
+    .btn.link {
+      background: transparent;
+      border-color: transparent;
+      color: #0c4a6e;
+      padding: 4px 2px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .tasks {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 11px 12px;
+      display: grid;
+      gap: 7px;
+      background: #fff;
+    }
+
+    .task.done {
+      opacity: 0.84;
+      background: #f6fbfa;
+      border-color: #b9e5d7;
+    }
+
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .task-title {
+      font-weight: 700;
+      font-size: 0.99rem;
+    }
+
+    .task-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .task-reason {
+      font-size: 0.86rem;
+      color: #334155;
+    }
+
+    .journey-wrap,
+    .library-wrap {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .journey-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .journey-col {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      background: #fff;
+      min-height: 120px;
+    }
+
+    .journey-col h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+    }
+
+    .journey-item {
+      border-top: 1px dashed var(--line);
+      padding-top: 7px;
+      margin-top: 7px;
+      font-size: 0.88rem;
+    }
+
+    .journey-item:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+
+    .library-tools {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 8px;
+    }
+
+    .input, .select {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      background: #fff;
+    }
+
+    .library-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .asset {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .asset-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .asset-title { font-weight: 650; }
+
+    .asset-meta { font-size: 0.82rem; color: var(--muted); }
+
+    .panel-side {
+      position: sticky;
+      top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .demo-panel,
+    .chat-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .demo-head,
+    .chat-head {
+      background: #f7fbff;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+    }
+
+    .demo-body,
+    .chat-body {
+      padding: 10px 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .demo-actions,
+    .demo-prompts,
+    .hard-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .demo-actions .btn,
+    .demo-prompts .btn,
+    .hard-controls .btn {
+      padding: 8px 9px;
+      font-size: 0.83rem;
+      width: 100%;
+    }
+
+    .demo-prompts,
+    .hard-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .step-box {
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fff;
+      display: grid;
+      gap: 5px;
+    }
+
+    .chat-log {
+      background: #fbfdff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 210px;
+      max-height: 330px;
+      overflow: auto;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .msg {
+      border-radius: 10px;
+      padding: 8px 9px;
+      font-size: 0.87rem;
+      white-space: pre-wrap;
+    }
+
+    .msg.user {
+      justify-self: end;
+      background: #d9f2ff;
+      border: 1px solid #a5ddff;
+      max-width: 95%;
+    }
+
+    .msg.assistant {
+      justify-self: start;
+      background: #f0f6ff;
+      border: 1px solid #d6e5ff;
+      max-width: 95%;
+    }
+
+    .chat-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .modal-shell {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      z-index: 50;
+    }
+
+    .modal-shell.show { display: flex; }
+
+    .modal {
+      width: min(940px, 96vw);
+      max-height: 92vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      position: relative;
+    }
+
+    .close-x {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .deck-slide {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fbfdff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .deck-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .bullet-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+
+    .original-section {
+      border-top: 1px dashed var(--line);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .checkin-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      background: #fff;
+    }
+
+    .slider-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.83rem;
+      z-index: 70;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+
+    .toast.show { opacity: 1; }
+
+    .quiz-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 6px;
+    }
+
+    .quiz-option {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px;
+      background: #fbfdff;
+    }
+
+    .kbd {
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .muted { color: var(--muted); }
+
+    @media (max-width: 1080px) {
+      .shell { grid-template-columns: 1fr; }
+      .panel-side { position: static; }
+      .demo-actions, .demo-prompts, .hard-controls { grid-template-columns: 1fr 1fr; }
+      .library-tools { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .demo-actions, .demo-prompts, .hard-controls { grid-template-columns: 1fr; }
+      .deck-nav { grid-template-columns: 1fr; }
+      .chat-form { grid-template-columns: 1fr; }
+    }
+  </style>
+  <style>
+    :root {
+      --acl-bg: #f8fafc;
+      --acl-card: #ffffff;
+      --acl-card-strong: #f1f5f9;
+      --acl-border: rgba(148, 163, 184, 0.25);
+      --acl-border-strong: rgba(148, 163, 184, 0.4);
+      --acl-border-subtle: rgba(148, 163, 184, 0.2);
+      --acl-muted: #64748b;
+      --acl-text: #0f172a;
+      --acl-primary: #0ea5e9;
+      --acl-success: #22c55e;
+      --acl-warning: #f59e0b;
+      --acl-danger: #ef4444;
+      --acl-accent: #f97316;
+      --acl-surface: rgba(255, 255, 255, 0.9);
+      --acl-surface-strong: rgba(255, 255, 255, 0.98);
+      --acl-shell-bg:
+        radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.12), transparent 55%),
+        radial-gradient(circle at 90% 0%, rgba(14, 116, 144, 0.12), transparent 60%),
+        linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(226, 232, 240, 0.98));
+      --acl-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
+      --acl-shadow-soft: 0 14px 24px rgba(15, 23, 42, 0.08);
+      --acl-overlay-strong: rgba(15, 23, 42, 0.55);
+      --acl-pill-bg: color-mix(in srgb, var(--acl-border) 65%, transparent);
+      --acl-pill-bg-strong: color-mix(in srgb, var(--acl-border) 90%, transparent);
+      --acl-ghost-bg: color-mix(in srgb, var(--acl-border) 70%, transparent);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--acl-text);
+      background: var(--acl-shell-bg);
+    }
+
+    .shell {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      padding: 24px 20px 28px;
+      gap: 18px;
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+
+    .panel,
+    .demo-panel,
+    .chat-panel {
+      border-radius: 22px;
+      border: 1px solid var(--acl-border);
+      background: var(--acl-card);
+      box-shadow: var(--acl-shadow-soft);
+    }
+
+    .top {
+      padding: 24px 22px 18px;
+      border-bottom: 1px solid var(--acl-border-subtle);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%), var(--acl-surface-strong);
+      border-radius: 22px;
+    }
+
+    .headline h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px;
+      line-height: 1.06;
+      letter-spacing: -0.01em;
+    }
+
+    .sub,
+    .tiny,
+    .asset-meta,
+    .task-meta,
+    .muted {
+      color: var(--acl-muted);
+    }
+
+    .chip,
+    .tab {
+      border: 1px solid var(--acl-border-strong);
+      background: var(--acl-pill-bg);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    .chip.active,
+    .tab.active {
+      color: var(--acl-primary);
+      border-color: color-mix(in srgb, var(--acl-primary) 55%, var(--acl-border));
+      background: color-mix(in srgb, var(--acl-primary) 18%, transparent);
+    }
+
+    .btn {
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px;
+    }
+
+    .btn.primary {
+      background: var(--acl-primary);
+      color: #fff;
+      box-shadow: 0 8px 18px color-mix(in srgb, var(--acl-primary) 30%, transparent);
+    }
+
+    .btn.primary:hover {
+      background: #0891d1;
+    }
+
+    .btn.ghost {
+      background: var(--acl-ghost-bg);
+      border-color: var(--acl-border-strong);
+      color: var(--acl-text);
+    }
+
+    .btn.link {
+      color: var(--acl-primary);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px dashed color-mix(in srgb, var(--acl-primary) 40%, transparent);
+      border-radius: 0;
+      padding-bottom: 1px;
+    }
+
+    #viewPanel {
+      overflow: hidden;
+    }
+
+    .today-wrap,
+    .journey-wrap,
+    .library-wrap {
+      padding: 18px;
+      gap: 14px;
+    }
+
+    .today-hero,
+    .journey-col,
+    .asset,
+    .step-box,
+    .chat-log,
+    .deck-slide,
+    .checkin-box,
+    .quiz-item,
+    .quiz-option,
+    .input,
+    .select {
+      border-radius: 14px;
+      border: 1px solid var(--acl-border-subtle);
+      background: var(--acl-surface);
+      box-shadow: none;
+    }
+
+    .today-hero {
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(15, 23, 42, 0.08));
+      border-color: color-mix(in srgb, var(--acl-primary) 35%, var(--acl-border));
+      padding: 14px;
+    }
+
+    .today-hero.highlight {
+      border-color: color-mix(in srgb, var(--acl-primary) 55%, var(--acl-border));
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--acl-primary) 25%, transparent);
+    }
+
+    .task {
+      border-radius: 18px;
+      border-color: var(--acl-border);
+      background: var(--acl-card);
+      padding: 14px 14px;
+      gap: 8px;
+    }
+
+    .task-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 27px;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+
+    .task-meta {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .task.done {
+      border-color: color-mix(in srgb, var(--acl-success) 45%, var(--acl-border));
+      background: color-mix(in srgb, var(--acl-success) 8%, var(--acl-card));
+      opacity: 1;
+    }
+
+    .task-reason {
+      font-size: 15px;
+      color: #334155;
+      line-height: 1.45;
+    }
+
+    .kbd {
+      border-radius: 999px;
+      border: 1px solid var(--acl-border-strong);
+      padding: 4px 8px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--acl-pill-bg);
+      color: var(--acl-muted);
+      font-weight: 700;
+    }
+
+    .panel-side {
+      top: 20px;
+      gap: 14px;
+    }
+
+    .demo-head,
+    .chat-head {
+      background: var(--acl-surface-strong);
+      border-bottom: 1px solid var(--acl-border-subtle);
+      padding: 12px 14px;
+    }
+
+    .demo-head strong,
+    .chat-head strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+    }
+
+    .demo-body,
+    .chat-body {
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .chat-log {
+      min-height: 250px;
+      max-height: 360px;
+      padding: 12px;
+      background: var(--acl-surface);
+    }
+
+    .msg {
+      border-radius: 12px;
+      padding: 9px 10px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .msg.user {
+      background: color-mix(in srgb, var(--acl-primary) 14%, var(--acl-card));
+      border-color: color-mix(in srgb, var(--acl-primary) 35%, var(--acl-border));
+    }
+
+    .msg.assistant {
+      background: var(--acl-card-strong);
+      border-color: var(--acl-border-subtle);
+    }
+
+    .modal-shell {
+      background: var(--acl-overlay-strong);
+      z-index: 130;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal {
+      width: min(980px, 96vw);
+      border-radius: 22px;
+      border: 1px solid var(--acl-border);
+      background: var(--acl-card);
+      box-shadow: var(--acl-shadow);
+      padding: 14px;
+    }
+
+    .modal h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 38px;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .close-x {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--acl-border-subtle);
+      background: var(--acl-surface);
+      font-size: 16px;
+    }
+
+    .deck-slide {
+      border-radius: 18px;
+      padding: 14px;
+      background: var(--acl-card-strong);
+      border-color: var(--acl-border-subtle);
+    }
+
+    .deck-slide h3 {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 31px;
+      line-height: 1.06;
+      letter-spacing: -0.01em;
+    }
+
+    .deck-nav {
+      border: 1px solid var(--acl-border-subtle);
+      border-radius: 14px;
+      padding: 8px;
+      background: var(--acl-surface-strong);
+    }
+
+    .bullet-list {
+      margin-top: 8px;
+      row-gap: 8px;
+    }
+
+    .checkin-box {
+      background: var(--acl-card);
+      border-color: var(--acl-border-subtle);
+      border-radius: 16px;
+    }
+
+    .quiz-grid {
+      gap: 12px;
+    }
+
+    .quiz-item {
+      border-radius: 14px;
+      padding: 12px;
+      border-color: color-mix(in srgb, var(--acl-primary) 20%, var(--acl-border));
+      background: #fff;
+    }
+
+    .quiz-item strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+    }
+
+    .quiz-option {
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 15px;
+      background: var(--acl-card);
+      border-color: color-mix(in srgb, var(--acl-primary) 22%, var(--acl-border));
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: color-mix(in srgb, var(--acl-primary) 46%, var(--acl-border));
+      background: color-mix(in srgb, var(--acl-primary) 8%, var(--acl-card));
+    }
+
+    .quiz-option:has(input:checked) {
+      border-color: color-mix(in srgb, var(--acl-primary) 62%, var(--acl-border));
+      background: color-mix(in srgb, var(--acl-primary) 12%, var(--acl-card));
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--acl-primary) 20%, transparent);
+    }
+
+    .input,
+    .select,
+    .chat-form .input {
+      border-radius: 10px;
+      border-color: var(--acl-border-subtle);
+      background: var(--acl-surface);
+      padding: 10px 12px;
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    @media (max-width: 1180px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .panel-side {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        padding: 12px 10px 22px;
+        gap: 12px;
+      }
+      .top,
+      .today-wrap,
+      .journey-wrap,
+      .library-wrap {
+        padding: 14px;
+      }
+      .headline h1 {
+        font-size: 26px;
+      }
+      .task-title {
+        font-size: 22px;
+      }
+      .modal h2,
+      .deck-slide h3 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main class="main">
+      <section class="panel top" id="topPanel"></section>
+      <section class="panel" id="viewPanel"></section>
+    </main>
+
+    <aside class="panel-side">
+      <section class="demo-panel" id="demoPanel"></section>
+      <section class="chat-panel" id="chatPanel"></section>
+    </aside>
+  </div>
+
+  <div class="modal-shell" id="modalShell"></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var CONTENT = {
+  "contentKey": "vori_demo_v3",
+  "procedure": {
+    "id": "acl_vori_demo",
+    "name": "ACL Reconstruction",
+    "timelineLabel": "Pre-Op Day",
+    "patientInitials": "RV",
+    "phaseKey": "preop"
+  },
+  "assets": [
+    {
+      "id": "asset_day_of_surgery_checklist",
+      "type": "pdf",
+      "title": "Day-of-Surgery Checklist",
+      "deckId": "deck_checklist",
+      "pinned": true,
+      "meta": "3 min read",
+      "phase": "preop",
+      "summary": "A tight checklist for the morning of surgery.",
+      "original": {
+        "title": "Day-of-Surgery Checklist",
+        "sections": [
+          {
+            "heading": "Arrival",
+            "body": "Arrive 90 minutes early with ID and insurance."
+          },
+          {
+            "heading": "Fasting",
+            "body": "No food or drink after midnight unless instructed."
+          },
+          {
+            "heading": "Bring",
+            "body": "Loose shorts, slip-on shoes, phone charger, and a ride home."
+          }
+        ]
+      }
+    },
+    {
+      "id": "asset_pain_plan",
+      "type": "pdf",
+      "title": "Pain Plan + Red Flags",
+      "deckId": "deck_pain_plan",
+      "pinned": true,
+      "meta": "4 min read",
+      "phase": "preop",
+      "summary": "How to stay ahead of pain and when to call the clinic.",
+      "original": {
+        "title": "Pain Plan + Red Flags",
+        "sections": [
+          {
+            "heading": "Pain control",
+            "body": "Start meds before pain spikes. Use ice and elevation."
+          },
+          {
+            "heading": "Red flags",
+            "body": "Call for fever, worsening redness, or calf pain."
+          }
+        ]
+      }
+    },
+    {
+      "id": "asset_wound_check",
+      "type": "pdf",
+      "title": "Post-Op Wound Check",
+      "deckId": "deck_wound_check",
+      "pinned": true,
+      "meta": "3 min read",
+      "phase": "recovery",
+      "summary": "Daily incision checks and red-flag signs.",
+      "original": {
+        "title": "Post-Op Wound Check",
+        "sections": [
+          {
+            "heading": "Daily check",
+            "body": "Check dressing, redness, warmth, and drainage once daily."
+          },
+          {
+            "heading": "Call now if",
+            "body": "Fever over 101F, spreading redness, or bad-smelling drainage."
+          }
+        ]
+      }
+    },
+    {
+      "id": "asset_postop_guide",
+      "type": "pdf",
+      "title": "Post-Op Day 2 Guide",
+      "deckId": "deck_postop_guide",
+      "pinned": true,
+      "meta": "4 min read",
+      "phase": "recovery",
+      "summary": "Pain, wound, and mobility priorities for post-op day 2.",
+      "original": {
+        "title": "Post-Op Day 2 Guide",
+        "sections": [
+          {
+            "heading": "What to monitor",
+            "body": "Track pain trend, swelling pattern, and incision appearance at the same time each day."
+          },
+          {
+            "heading": "What to do today",
+            "body": "Take meds on schedule, elevate and ice, and complete your PT home exercises."
+          },
+          {
+            "heading": "When to call",
+            "body": "Call for fever over 101F, spreading redness, bad-smelling drainage, or sudden calf pain."
+          }
+        ]
+      }
+    },
+    {
+      "id": "asset_facility_tour",
+      "type": "tour",
+      "title": "Facility Tour",
+      "meta": "2 min",
+      "phase": "preop",
+      "summary": "A quick walkthrough so check-in feels familiar.",
+      "url": "https://www.youtube.com/embed/9No-FiEInLA"
+    },
+    {
+      "id": "asset_crutches_video",
+      "type": "video",
+      "title": "Crutches + Brace Setup",
+      "meta": "3 min",
+      "phase": "preop",
+      "summary": "Fit your brace and set crutches to the right height.",
+      "url": "https://www.youtube.com/embed/4GZbWICcO5Y"
+    },
+    {
+      "id": "asset_pt_milestones",
+      "type": "pdf",
+      "title": "PT Milestones",
+      "deckId": "deck_pt_milestones",
+      "meta": "5 min",
+      "phase": "recovery",
+      "summary": "Week-by-week focus areas for your first month.",
+      "original": {
+        "title": "PT Milestones",
+        "sections": [
+          {
+            "heading": "First 72 hours",
+            "body": "Focus on swelling control: elevate, ice, and gentle ankle pumps."
+          },
+          {
+            "heading": "Week 1",
+            "body": "Rebuild basics with quad sets, heel slides, and short supported walks."
+          },
+          {
+            "heading": "Week 2",
+            "body": "Progress range of motion and control under PT guidance."
+          }
+        ]
+      },
+      "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    },
+    {
+      "id": "asset_home_setup",
+      "type": "pdf",
+      "title": "Home Setup Checklist",
+      "meta": "2 min",
+      "phase": "preop",
+      "summary": "Prep your space for a smooth first week.",
+      "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    }
+  ],
+  "decks": {
+    "deck_checklist": [
+      {
+        "title": "Night Before",
+        "lede": "Set yourself up for a calm morning.",
+        "bullets": [
+          "Confirm arrival time.",
+          "Charge phone and set alarms.",
+          "Pack loose shorts and slip-on shoes."
+        ]
+      },
+      {
+        "title": "Morning Of",
+        "lede": "Fast and keep it simple.",
+        "bullets": [
+          "No food or drink after midnight.",
+          "Take approved meds with a sip of water.",
+          "Bring ID and insurance card."
+        ]
+      },
+      {
+        "title": "Check-In",
+        "lede": "Expect a short checklist.",
+        "bullets": [
+          "Review allergies and meds.",
+          "Confirm surgical site.",
+          "Meet anesthesia team."
+        ]
+      },
+      {
+        "title": "Going Home",
+        "lede": "Plan for a quiet day.",
+        "bullets": [
+          "Ride home confirmed.",
+          "Pain meds ready.",
+          "Crutches or brace fitted."
+        ]
+      }
+    ],
+    "deck_pain_plan": [
+      {
+        "title": "Pain Plan",
+        "lede": "Stay ahead of discomfort.",
+        "bullets": [
+          "Take meds on schedule.",
+          "Ice and elevate every 2 hours.",
+          "Sleep with the brace on if instructed."
+        ]
+      },
+      {
+        "title": "Red Flags",
+        "lede": "Call the clinic if you notice:",
+        "bullets": [
+          "Fever over 101F.",
+          "Drainage with odor.",
+          "Worsening calf pain or swelling."
+        ]
+      },
+      {
+        "title": "If Pain Spikes",
+        "lede": "Use the rescue plan.",
+        "bullets": [
+          "Use the prescribed backup med.",
+          "Elevate above heart.",
+          "Message the care team if not improving."
+        ]
+      }
+    ],
+    "deck_wound_check": [
+      {
+        "title": "Daily Wound Check",
+        "lede": "Take one minute each day before your evening meds.",
+        "bullets": [
+          "Look for increasing redness around the incision.",
+          "Check for new drainage, odor, or warmth.",
+          "Take a quick photo if anything changes."
+        ]
+      },
+      {
+        "title": "Normal vs Not Normal",
+        "lede": "Mild swelling is common. Worsening symptoms are not.",
+        "bullets": [
+          "Normal: mild bruising, light soreness, stable swelling.",
+          "Not normal: fever, spreading redness, worsening pain.",
+          "When unsure, call your surgeon's office."
+        ]
+      },
+      {
+        "title": "Escalation Plan",
+        "lede": "Know the next action before symptoms change.",
+        "bullets": [
+          "Message clinic with symptoms and photo.",
+          "Use after-hours number for urgent concerns.",
+          "Go to urgent care or ER for severe symptoms."
+        ]
+      }
+    ],
+    "deck_postop_guide": [
+      {
+        "title": "Post-Op Day 2 Priorities",
+        "lede": "Keep recovery simple and consistent today.",
+        "bullets": [
+          "Stay on your pain and icing schedule.",
+          "Elevate above heart when resting.",
+          "Use your brace and crutches as directed."
+        ]
+      },
+      {
+        "title": "Pain + Swelling",
+        "lede": "Look for trend changes, not one moment.",
+        "bullets": [
+          "Pain should gradually stabilize after meds.",
+          "Swelling can be present but should not spike suddenly.",
+          "Log pain score and swelling once in the morning and evening."
+        ]
+      },
+      {
+        "title": "Wound + Red Flags",
+        "lede": "Know what needs same-day outreach.",
+        "bullets": [
+          "Watch for fever, spreading redness, or foul drainage.",
+          "Take a quick incision photo if appearance changes.",
+          "Call the clinic now if any red flag appears."
+        ]
+      }
+    ],
+    "deck_pt_milestones": [
+      {
+        "title": "First 72 Hours",
+        "lede": "Swelling control is the job.",
+        "bullets": [
+          "Elevate above heart whenever resting.",
+          "Ice as prescribed to control swelling.",
+          "Start early motion per your protocol."
+        ]
+      },
+      {
+        "title": "Week One",
+        "lede": "Build the basics consistently.",
+        "bullets": [
+          "Ankle pumps and quad sets every day.",
+          "Short walks with brace/crutches as directed.",
+          "Track pain and stiffness before PT."
+        ]
+      },
+      {
+        "title": "Week Two",
+        "lede": "Regain control safely.",
+        "bullets": [
+          "Increase range of motion gradually.",
+          "Start balance and gait quality work.",
+          "Report sharp pain or sudden swelling spikes."
+        ]
+      }
+    ]
+  },
+  "todayTasks": [
+    {
+      "id": "task_behavior_quiz",
+      "category": "profile",
+      "label": "Quiz",
+      "title": "Take the behavioral quiz",
+      "desc": "Choose your motivation style so SARA can tune prompts.",
+      "reason": "Personalization should feel intentional from the first screen.",
+      "due": "Now",
+      "eta": "1 min",
+      "phase": "preop",
+      "priority": 0,
+      "primaryAction": {
+        "type": "open_behavior_quiz",
+        "button": "Start quiz"
+      },
+      "aiPrompt": "Can you help me run the behavior quiz?"
+    },
+    {
+      "id": "task_open_checklist",
+      "category": "learn",
+      "label": "Checklist",
+      "title": "Day-of-surgery checklist",
+      "desc": "A tight checklist for the morning of surgery.",
+      "reason": "Clarity reduces last-minute stress.",
+      "due": "Today",
+      "eta": "3 min",
+      "phase": "preop",
+      "priority": 1,
+      "primaryAction": {
+        "type": "open_deck",
+        "deckId": "deck_checklist",
+        "assetId": "asset_day_of_surgery_checklist",
+        "button": "Open checklist"
+      },
+      "aiPrompt": "Walk me through my day-of-surgery checklist."
+    },
+    {
+      "id": "task_daily_checkin",
+      "category": "check",
+      "label": "Check-in",
+      "title": "Pre-op confidence check-in",
+      "desc": "How confident do you feel about tomorrow?",
+      "reason": "We tailor support based on your response.",
+      "due": "Tonight",
+      "eta": "1 min",
+      "phase": "preop",
+      "priority": 2,
+      "primaryAction": {
+        "type": "slider_checkin",
+        "button": "Start",
+        "field": "confidence"
+      },
+      "aiPrompt": "What should I include in my pre-op confidence check-in?"
+    },
+    {
+      "id": "task_confirm_pickup",
+      "category": "action",
+      "label": "Action",
+      "title": "Confirm your ride home",
+      "desc": "Text your driver with the pickup plan.",
+      "reason": "Prevents day-of surprises.",
+      "due": "Today",
+      "eta": "2 min",
+      "phase": "preop",
+      "priority": 3,
+      "primaryAction": {
+        "type": "action_complete",
+        "button": "Confirmed"
+      }
+    },
+    {
+      "id": "task_open_pain_plan",
+      "category": "learn",
+      "label": "Guide",
+      "title": "Pain plan + red flags",
+      "desc": "Know what is normal and when to call.",
+      "reason": "Safety first after surgery.",
+      "due": "Today",
+      "eta": "4 min",
+      "phase": "preop",
+      "priority": 4,
+      "primaryAction": {
+        "type": "open_deck",
+        "deckId": "deck_pain_plan",
+        "assetId": "asset_pain_plan",
+        "button": "Open plan"
+      },
+      "aiPrompt": "What pain is concerning?"
+    },
+    {
+      "id": "task_open_crutches_video",
+      "category": "learn",
+      "label": "Video",
+      "title": "Crutches + brace setup",
+      "desc": "Set the correct height and lock settings.",
+      "reason": "A 3-minute setup saves a lot of pain.",
+      "due": "Today",
+      "eta": "3 min",
+      "phase": "preop",
+      "priority": 5,
+      "primaryAction": {
+        "type": "open_asset",
+        "assetId": "asset_crutches_video",
+        "button": "Watch video"
+      },
+      "aiPrompt": "Give me crutches setup tips."
+    },
+    {
+      "id": "task_reset",
+      "category": "reset",
+      "label": "Reset",
+      "title": "60-second reset",
+      "desc": "A quick breathing reset to lower stress.",
+      "reason": "Calm helps you remember the plan.",
+      "due": "Anytime",
+      "eta": "1 min",
+      "phase": "preop",
+      "priority": 6,
+      "primaryAction": {
+        "type": "open_reset",
+        "button": "Start reset"
+      }
+    },
+    {
+      "id": "task_postop_pain_check",
+      "category": "check",
+      "label": "Check-in",
+      "title": "Post-op pain check-in (day 2)",
+      "desc": "Rate pain and swelling so your plan can adapt.",
+      "reason": "Day 2 trends help catch issues early.",
+      "due": "Post-op day 2",
+      "eta": "1 min",
+      "phase": "recovery",
+      "priority": 7,
+      "primaryAction": {
+        "type": "slider_checkin",
+        "button": "Start",
+        "field": "pain"
+      },
+      "aiPrompt": "What should I report in my post-op pain check-in?"
+    },
+    {
+      "id": "task_postop_guide",
+      "category": "learn",
+      "label": "Guide",
+      "title": "Post-op day 2 guide",
+      "desc": "Get the exact pain, wound, and mobility priorities for today.",
+      "reason": "A concrete day-2 guide keeps recovery decisions consistent.",
+      "due": "Post-op day 2",
+      "eta": "3 min",
+      "phase": "recovery",
+      "priority": 8,
+      "primaryAction": {
+        "type": "open_deck",
+        "deckId": "deck_postop_guide",
+        "assetId": "asset_postop_guide",
+        "button": "Open post-op guide"
+      },
+      "aiPrompt": "Open my post-op day 2 guide."
+    },
+    {
+      "id": "task_postop_wound_check",
+      "category": "learn",
+      "label": "Guide",
+      "title": "Post-op wound check",
+      "desc": "Use this 1-minute checklist for incision safety.",
+      "reason": "Consistent checks reduce delayed complications.",
+      "due": "Post-op day 2",
+      "eta": "2 min",
+      "phase": "recovery",
+      "priority": 9,
+      "primaryAction": {
+        "type": "open_deck",
+        "deckId": "deck_wound_check",
+        "assetId": "asset_wound_check",
+        "button": "Open wound check"
+      },
+      "aiPrompt": "What wound signs should I watch for today?"
+    },
+    {
+      "id": "task_postop_pt_reminder",
+      "category": "learn",
+      "label": "PT Guide",
+      "title": "PT reminder: review session plan",
+      "desc": "Review today's PT focus before starting session 1.",
+      "reason": "Early PT consistency drives long-term outcomes.",
+      "due": "Post-op day 2",
+      "eta": "3 min",
+      "phase": "recovery",
+      "priority": 10,
+      "primaryAction": {
+        "type": "open_deck",
+        "deckId": "deck_pt_milestones",
+        "assetId": "asset_pt_milestones",
+        "button": "Open PT plan"
+      },
+      "aiPrompt": "What should I focus on in PT today?"
+    }
+  ],
+  "journey": {
+    "completed": [
+      {
+        "date": "Feb 1",
+        "title": "Pre-op clearance",
+        "desc": "Labs reviewed."
+      }
+    ],
+    "today": {
+      "title": "Pre-op day",
+      "desc": "Focus on the checklist and check-in."
+    },
+    "upcoming": [
+      {
+        "date": "Feb 6",
+        "title": "Surgery day",
+        "desc": "Arrival at 6:00 AM."
+      },
+      {
+        "date": "Feb 7",
+        "title": "Post-op day 1 check",
+        "desc": "Pain and wound check-in."
+      },
+      {
+        "date": "Feb 8",
+        "title": "First PT visit",
+        "desc": "Learn your home program."
+      }
+    ]
+  },
+  "commonQuestions": [
+    {
+      "id": "faq_vori_1",
+      "phase": "preop",
+      "topic": "Pre-Op",
+      "question": "Can I eat the morning of surgery?",
+      "answer": "No food or drink after midnight unless your surgeon gives different instructions."
+    },
+    {
+      "id": "faq_vori_2",
+      "phase": "preop",
+      "topic": "Pre-Op",
+      "question": "What should I bring?",
+      "answer": "Bring ID, insurance card, loose shorts, and a phone charger."
+    },
+    {
+      "id": "faq_vori_3",
+      "phase": "post-op",
+      "topic": "Post-Op",
+      "question": "How often should I check my incision?",
+      "answer": "Check it once daily and call if redness, fever, or drainage worsens."
+    },
+    {
+      "id": "faq_vori_4",
+      "phase": "post-op",
+      "topic": "Post-Op",
+      "question": "What if pain spikes on day 2?",
+      "answer": "Use your rescue plan, elevate, ice, and contact your clinic if symptoms continue to worsen."
+    },
+    {
+      "id": "faq_vori_5",
+      "phase": "post-op",
+      "topic": "Post-Op",
+      "question": "Do I need PT this early?",
+      "answer": "Yes. Early guided PT helps reduce stiffness and improve long-term knee function."
+    }
+  ]
+};
+    var PATHWAY = {
+  "id": "vori",
+  "title": "Vori Guided Demo",
+  "steps": [
+    {
+      "id": "behavior_quiz",
+      "title": "Behavior Quiz",
+      "tab": "today",
+      "narration": "Start with a quick behavior quiz to personalize the demo tone.",
+      "agentSuggestedUtterances": [
+        "Can you help me run the behavior quiz?"
+      ],
+      "onEnter": [
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "CLOSE_OVERLAYS"
+        },
+        {
+          "type": "OPEN_PANEL",
+          "panel": "personaPicker"
+        },
+        {
+          "type": "HIGHLIGHT",
+          "key": "personaPicker"
+        }
+      ]
+    },
+    {
+      "id": "preop_today",
+      "title": "Pre-Op Day Plan",
+      "tab": "today",
+      "narration": "Anchor the walkthrough on pre-op day so the plan reads like a real care day.",
+      "agentSuggestedUtterances": [
+        "What should I do on pre-op day?"
+      ],
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "PRE_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "CLOSE_OVERLAYS"
+        },
+        {
+          "type": "HIGHLIGHT",
+          "key": "todayPlan"
+        }
+      ]
+    },
+    {
+      "id": "preop_plan",
+      "title": "Agent: Explain Today Plan",
+      "tab": "today",
+      "narration": "Use assistant Q&A for planning context, not UI control.",
+      "agentSuggestedUtterances": [
+        "What should I do today?"
+      ],
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "PRE_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "CLOSE_OVERLAYS"
+        }
+      ]
+    },
+    {
+      "id": "checklist",
+      "title": "Checklist Resource",
+      "tab": "today",
+      "narration": "Open the checklist deterministically while assistant explains it.",
+      "agentSuggestedUtterances": [
+        "Walk me through my day-of-surgery checklist."
+      ],
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "PRE_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "OPEN_DECK",
+          "deckId": "deck_checklist"
+        }
+      ]
+    },
+    {
+      "id": "preop_checkin",
+      "title": "Pre-Op Check-In",
+      "tab": "today",
+      "narration": "Run a check-in and show completion updates in-line.",
+      "agentSuggestedUtterances": [
+        "What should I include in my pre-op confidence check-in?"
+      ],
+      "recommendedCheckinTaskId": "task_daily_checkin",
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "PRE_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "START_CHECKIN",
+          "checkinKey": "task_daily_checkin"
+        }
+      ]
+    },
+    {
+      "id": "postop_day",
+      "title": "Switch: Post-Op Day 2",
+      "tab": "today",
+      "narration": "Flip to post-op day 2 and show different tasks instantly.",
+      "agentSuggestedUtterances": [
+        "What should I do on post-op day 2?"
+      ],
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "POST_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "CLOSE_OVERLAYS"
+        },
+        {
+          "type": "HIGHLIGHT",
+          "key": "todayPlan"
+        }
+      ]
+    },
+    {
+      "id": "postop_pain_check",
+      "title": "Post-Op Pain Check",
+      "tab": "today",
+      "narration": "Complete a post-op pain check-in to close the loop for day 2.",
+      "agentSuggestedUtterances": [
+        "What should I report in my post-op pain check-in?"
+      ],
+      "recommendedCheckinTaskId": "task_postop_pain_check",
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "POST_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "START_CHECKIN",
+          "checkinKey": "task_postop_pain_check"
+        }
+      ]
+    },
+    {
+      "id": "postop_wound",
+      "title": "Post-Op Day 2 Guide",
+      "tab": "today",
+      "narration": "Open the post-op guide so pain, wound, and mobility priorities are explicit.",
+      "agentSuggestedUtterances": [
+        "Open my post-op day 2 guide."
+      ],
+      "recommendedDeckId": "deck_postop_guide",
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "POST_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "OPEN_DECK",
+          "deckId": "deck_postop_guide"
+        }
+      ]
+    },
+    {
+      "id": "pt_reminder",
+      "title": "PT Reminder",
+      "tab": "today",
+      "narration": "Close with a PT reminder so recovery momentum is clear.",
+      "agentSuggestedUtterances": [
+        "What should I focus on in PT today?"
+      ],
+      "recommendedDeckId": "deck_pt_milestones",
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "POST_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "today"
+        },
+        {
+          "type": "OPEN_DECK",
+          "deckId": "deck_pt_milestones"
+        }
+      ]
+    },
+    {
+      "id": "library",
+      "title": "Library: Find the Right Resource",
+      "tab": "library",
+      "narration": "Use library filters to find post-op support content quickly.",
+      "agentSuggestedUtterances": [
+        "Show me PT milestones."
+      ],
+      "recommendedAssetId": "asset_pt_milestones",
+      "onEnter": [
+        {
+          "type": "SET_PHASE",
+          "phase": "POST_OP"
+        },
+        {
+          "type": "SET_TAB",
+          "tab": "library"
+        },
+        {
+          "type": "SET_LIBRARY_FILTER",
+          "filter": {
+            "query": "PT"
+          }
+        }
+      ]
+    }
+  ]
+};
+
+    var STORAGE_KEY = 'sara_standalone_vori_state_v1';
+    var RESET_SECONDS = 60;
+
+    var PERSONAS = {
+      achiever: {
+        id: 'achiever',
+        title: 'Achiever',
+        tone: 'energetic',
+        motifPrimary: 'competitor',
+        stylePrimary: 'visual',
+        planTone: 'Stack quick wins today.'
+      },
+      helper: {
+        id: 'helper',
+        title: 'Helper',
+        tone: 'supportive',
+        motifPrimary: 'helper',
+        stylePrimary: 'conversational',
+        planTone: 'One calm step at a time.'
+      }
+    };
+
+    var QUIZ = [
+      {
+        id: 'q1',
+        prompt: 'How do you like to stay on track?',
+        options: [
+          { id: 'q1_a', text: 'Give me quick wins and checkboxes.', persona: 'achiever' },
+          { id: 'q1_b', text: 'Give me calm, supportive reminders.', persona: 'helper' }
+        ]
+      },
+      {
+        id: 'q2',
+        prompt: 'When stress rises, what helps most?',
+        options: [
+          { id: 'q2_a', text: 'A direct next action right now.', persona: 'achiever' },
+          { id: 'q2_b', text: 'Reassurance and steady pacing.', persona: 'helper' }
+        ]
+      },
+      {
+        id: 'q3',
+        prompt: 'Preferred communication style?',
+        options: [
+          { id: 'q3_a', text: 'Concise and tactical.', persona: 'achiever' },
+          { id: 'q3_b', text: 'Conversational and encouraging.', persona: 'helper' }
+        ]
+      },
+      {
+        id: 'q4',
+        prompt: 'What feels motivating today?',
+        options: [
+          { id: 'q4_a', text: 'Progress streak and completion.', persona: 'achiever' },
+          { id: 'q4_b', text: 'Confidence and consistency.', persona: 'helper' }
+        ]
+      }
+    ];
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function nowIso() {
+      return new Date().toISOString();
+    }
+
+    function byId(list) {
+      var map = {};
+      list.forEach(function (item) { map[item.id] = item; });
+      return map;
+    }
+
+    var assetsById = byId(CONTENT.assets || []);
+    var tasksById = byId(CONTENT.todayTasks || []);
+
+    function normalizePhase(raw) {
+      var text = String(raw || '').toLowerCase();
+      if (text === 'pre_op' || text === 'pre-op' || text === 'preop') return 'preop';
+      if (text === 'post_op' || text === 'post-op' || text === 'postop' || text === 'recovery') return 'recovery';
+      if (text === 'last_minute' || text === 'surgery_day') return 'surgery';
+      return text || 'preop';
+    }
+
+    function phaseLabel(phase) {
+      if (phase === 'recovery') return 'Post-Op Day 2';
+      if (phase === 'surgery') return 'Surgery Day';
+      return 'Pre-Op Day';
+    }
+
+    function buildTaskStatus() {
+      var status = {};
+      (CONTENT.todayTasks || []).forEach(function (task) {
+        status[task.id] = { status: 'PENDING', completedAt: null, data: {} };
+      });
+      return status;
+    }
+
+    function createDefaultState() {
+      return {
+        contentKey: CONTENT.contentKey,
+        activeTab: 'today',
+        activePhase: normalizePhase(CONTENT.procedure && CONTENT.procedure.phaseKey),
+        taskStatus: buildTaskStatus(),
+        checkins: {},
+        personaId: '',
+        personaProfile: null,
+        quizAnswers: {},
+        demoStepId: PATHWAY.steps[0] ? PATHWAY.steps[0].id : '',
+        autoRun: true,
+        highlightKey: '',
+        libraryQuery: '',
+        libraryType: 'all',
+        deckModal: { open: false, deckId: '', assetId: '', index: 0, taskId: null, mode: 'cards' },
+        assetModal: { open: false, assetId: '', taskId: null },
+        checkinModal: { open: false, taskId: null, value: 3, note: '' },
+        resetModal: { open: false, running: false, secondsLeft: RESET_SECONDS },
+        quizModal: { open: false, taskId: null },
+        chatMessages: [
+          {
+            role: 'assistant',
+            text: 'Standalone mode is active. Ask for today plan, checklists, check-ins, PT milestones, or say "next".'
+          }
+        ]
+      };
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createDefaultState();
+        var parsed = JSON.parse(raw);
+        if (!parsed || parsed.contentKey !== CONTENT.contentKey) return createDefaultState();
+        var merged = createDefaultState();
+        Object.assign(merged, parsed);
+        merged.taskStatus = Object.assign(buildTaskStatus(), parsed.taskStatus || {});
+        if (!Array.isArray(merged.chatMessages) || !merged.chatMessages.length) {
+          merged.chatMessages = createDefaultState().chatMessages;
+        }
+        return merged;
+      } catch (err) {
+        return createDefaultState();
+      }
+    }
+
+    var state = loadState();
+    var resetTimer = null;
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        // ignore storage errors
+      }
+    }
+
+    function toast(text) {
+      var el = document.getElementById('toast');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () {
+        el.classList.remove('show');
+      }, 1800);
+    }
+
+    function getCurrentStep() {
+      var steps = PATHWAY.steps || [];
+      for (var i = 0; i < steps.length; i += 1) {
+        if (steps[i].id === state.demoStepId) return steps[i];
+      }
+      return steps[0] || null;
+    }
+
+    function getStepIndex(stepId) {
+      var steps = PATHWAY.steps || [];
+      for (var i = 0; i < steps.length; i += 1) {
+        if (steps[i].id === stepId) return i;
+      }
+      return 0;
+    }
+
+    function setStepByIndex(index, runActions) {
+      var steps = PATHWAY.steps || [];
+      if (!steps.length) return;
+      var next = Math.max(0, Math.min(index, steps.length - 1));
+      state.demoStepId = steps[next].id;
+      if (runActions) runStepOnEnter(steps[next]);
+      commit();
+    }
+
+    function nextStep() {
+      setStepByIndex(getStepIndex(state.demoStepId) + 1, state.autoRun);
+    }
+
+    function prevStep() {
+      setStepByIndex(getStepIndex(state.demoStepId) - 1, state.autoRun);
+    }
+
+    function jumpToStep(stepId) {
+      setStepByIndex(getStepIndex(stepId), state.autoRun);
+    }
+
+    function resetPathway() {
+      setStepByIndex(0, state.autoRun);
+    }
+
+    function runStepOnEnter(step) {
+      if (!step || !Array.isArray(step.onEnter)) return;
+      step.onEnter.forEach(function (action) {
+        var type = action && action.type;
+        if (!type) return;
+        if (type === 'SET_TAB') {
+          state.activeTab = action.tab || 'today';
+        } else if (type === 'SET_PHASE') {
+          state.activePhase = normalizePhase(action.phase);
+        } else if (type === 'OPEN_DECK') {
+          openDeck(action.deckId, null, 'step');
+        } else if (type === 'OPEN_ASSET') {
+          openAsset(action.assetId, null, 'step');
+        } else if (type === 'START_CHECKIN') {
+          openCheckin(action.checkinKey || action.taskId);
+        } else if (type === 'CLOSE_OVERLAYS') {
+          closeOverlays();
+        } else if (type === 'SET_LIBRARY_FILTER') {
+          state.libraryQuery = (action.filter && action.filter.query) || '';
+          state.activeTab = 'library';
+        } else if (type === 'OPEN_PANEL') {
+          if (action.panel === 'personaPicker') openBehaviorQuiz('task_behavior_quiz');
+        } else if (type === 'HIGHLIGHT') {
+          state.highlightKey = action.key || '';
+        }
+      });
+    }
+
+    function closeOverlays() {
+      state.deckModal = { open: false, deckId: '', assetId: '', index: 0, taskId: null, mode: 'cards' };
+      state.assetModal = { open: false, assetId: '', taskId: null };
+      state.checkinModal.open = false;
+      state.resetModal.open = false;
+      state.quizModal.open = false;
+      stopResetTimer();
+    }
+
+    function resolveAssetForDeck(deckId, preferredAssetId) {
+      if (preferredAssetId && assetsById[preferredAssetId]) return assetsById[preferredAssetId];
+      var list = CONTENT.assets || [];
+      for (var i = 0; i < list.length; i += 1) {
+        if (list[i].deckId === deckId) return list[i];
+      }
+      return null;
+    }
+
+    function openDeck(deckId, taskId, source) {
+      if (!deckId) return;
+      var slides = (CONTENT.decks && CONTENT.decks[deckId]) || [];
+      var linkedAsset = resolveAssetForDeck(deckId, '');
+      var hasOriginal = !!(linkedAsset && (linkedAsset.original || linkedAsset.summary));
+      if (!slides.length && !hasOriginal) {
+        toast('No guide content found for this deck.');
+        return;
+      }
+      state.deckModal.open = true;
+      state.deckModal.deckId = deckId;
+      state.deckModal.assetId = linkedAsset ? linkedAsset.id : '';
+      state.deckModal.index = 0;
+      state.deckModal.taskId = taskId || null;
+      state.deckModal.mode = slides.length ? 'cards' : 'original';
+      if (source !== 'task') {
+        state.activeTab = 'today';
+      }
+    }
+
+    function openAsset(assetId, taskId, source) {
+      if (!assetId || !assetsById[assetId]) {
+        toast('Asset not found in standalone pack.');
+        return;
+      }
+      var asset = assetsById[assetId];
+      if (asset.deckId) {
+        openDeck(asset.deckId, taskId, source || 'asset');
+        return;
+      }
+      state.assetModal.open = true;
+      state.assetModal.assetId = assetId;
+      state.assetModal.taskId = taskId || null;
+      if (taskId) completeTask(taskId, { source: source || 'asset' });
+    }
+
+    function completeTask(taskId, data) {
+      if (!taskId || !state.taskStatus[taskId]) return;
+      state.taskStatus[taskId] = {
+        status: 'COMPLETED',
+        completedAt: nowIso(),
+        data: Object.assign({}, state.taskStatus[taskId].data || {}, data || {})
+      };
+    }
+
+    function openCheckin(taskId) {
+      var resolved = taskId;
+      if (!resolved || !tasksById[resolved]) {
+        resolved = state.activePhase === 'recovery' ? 'task_postop_pain_check' : 'task_daily_checkin';
+      }
+      state.checkinModal.open = true;
+      state.checkinModal.taskId = resolved;
+      state.checkinModal.value = 3;
+      state.checkinModal.note = '';
+      state.activeTab = 'today';
+    }
+
+    function submitCheckin() {
+      var taskId = state.checkinModal.taskId;
+      if (!taskId) return;
+      state.checkins[taskId] = {
+        value: Number(state.checkinModal.value || 3),
+        note: String(state.checkinModal.note || ''),
+        submittedAt: nowIso()
+      };
+      completeTask(taskId, { checkin: true, value: state.checkinModal.value });
+      state.checkinModal.open = false;
+      toast('Check-in saved.');
+    }
+
+    function openBehaviorQuiz(taskId) {
+      state.quizModal.open = true;
+      state.quizModal.taskId = taskId || 'task_behavior_quiz';
+      state.activeTab = 'today';
+      state.highlightKey = 'personaPicker';
+    }
+
+    function submitBehaviorQuiz() {
+      var answers = state.quizAnswers || {};
+      var missing = QUIZ.some(function (item) { return !answers[item.id]; });
+      if (missing) {
+        toast('Please answer all quiz questions.');
+        return;
+      }
+      var score = { achiever: 0, helper: 0 };
+      QUIZ.forEach(function (q) {
+        var selected = answers[q.id];
+        var option = q.options.find(function (o) { return o.id === selected; });
+        if (option && option.persona && score[option.persona] !== undefined) {
+          score[option.persona] += 1;
+        }
+      });
+      var personaId = score.helper > score.achiever ? 'helper' : 'achiever';
+      state.personaId = personaId;
+      state.personaProfile = {
+        motifPrimary: PERSONAS[personaId].motifPrimary,
+        tone: PERSONAS[personaId].tone,
+        stylePrimary: PERSONAS[personaId].stylePrimary,
+        completedAt: nowIso()
+      };
+      if (state.quizModal.taskId) {
+        completeTask(state.quizModal.taskId, { behaviorQuiz: true, personaId: personaId });
+      }
+      state.quizModal.open = false;
+      toast('Behavior profile saved: ' + PERSONAS[personaId].title + '.');
+    }
+
+    function currentPhaseTasks() {
+      var phase = state.activePhase;
+      return (CONTENT.todayTasks || [])
+        .filter(function (task) {
+          var taskPhase = normalizePhase(task.phase || task.phaseKey || task.phaseId || 'preop');
+          return taskPhase === phase;
+        })
+        .sort(function (a, b) { return (a.priority || 999) - (b.priority || 999); });
+    }
+
+    function pendingTaskCount(tasks) {
+      return tasks.filter(function (task) {
+        return !(state.taskStatus[task.id] && state.taskStatus[task.id].completedAt);
+      }).length;
+    }
+
+    function todayPlanSummaryText() {
+      var tasks = currentPhaseTasks();
+      var open = tasks.filter(function (task) { return !state.taskStatus[task.id].completedAt; });
+      if (!open.length) return 'All tasks complete for this phase.';
+      var top = open.slice(0, 4).map(function (task, idx) {
+        return (idx + 1) + '. ' + task.title;
+      });
+      return top.join('\n');
+    }
+
+    function addChat(role, text) {
+      state.chatMessages.push({ role: role, text: text, at: nowIso() });
+      if (state.chatMessages.length > 24) state.chatMessages = state.chatMessages.slice(-24);
+    }
+
+    function sendAssistantPrompt(prompt, logUser) {
+      var text = String(prompt || '').trim();
+      if (!text) return false;
+      var normalized = text.toLowerCase();
+      if (logUser) addChat('user', text);
+
+      if (normalized.includes('behavior quiz')) {
+        openBehaviorQuiz('task_behavior_quiz');
+        addChat('assistant', 'Opening the behavior quiz now.');
+        commit();
+        return true;
+      }
+
+      if (normalized === 'next' || normalized.includes('continue')) {
+        nextStep();
+        addChat('assistant', 'Advanced to the next walkthrough step.');
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('what should i do') || normalized.includes('today plan')) {
+        addChat('assistant', 'Here is your plan for ' + phaseLabel(state.activePhase) + ':\n' + todayPlanSummaryText());
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('checklist')) {
+        openDeck('deck_checklist', 'task_open_checklist', 'assistant');
+        addChat('assistant', 'Opened the day-of-surgery checklist.');
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('post-op day 2 guide') || normalized.includes('postop guide')) {
+        state.activePhase = 'recovery';
+        openDeck('deck_postop_guide', 'task_postop_guide', 'assistant');
+        addChat('assistant', 'Opened your post-op day 2 guide.');
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('wound')) {
+        state.activePhase = 'recovery';
+        openDeck('deck_wound_check', 'task_postop_wound_check', 'assistant');
+        addChat('assistant', 'Opened wound check guidance.');
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('check-in') || normalized.includes('check in')) {
+        if (state.activePhase === 'recovery') {
+          openCheckin('task_postop_pain_check');
+        } else {
+          openCheckin('task_daily_checkin');
+        }
+        addChat('assistant', 'Opened the check-in.');
+        commit();
+        return true;
+      }
+
+      if (normalized.includes('pt')) {
+        state.activePhase = 'recovery';
+        if (normalized.includes('library') || normalized.includes('show me')) {
+          state.activeTab = 'library';
+          state.libraryQuery = 'PT';
+          addChat('assistant', 'Switched to Library and filtered for PT resources.');
+        } else {
+          openDeck('deck_pt_milestones', 'task_postop_pt_reminder', 'assistant');
+          addChat('assistant', 'Opened PT milestones.');
+        }
+        commit();
+        return true;
+      }
+
+      addChat('assistant', 'In standalone mode I can run the behavior quiz, open decks/resources, run check-ins, and step the walkthrough.');
+      commit();
+      return true;
+    }
+
+    function taskPrimaryAction(task) {
+      if (!task || !task.primaryAction) return;
+      var action = String(task.primaryAction.type || '').toLowerCase();
+      if (action === 'open_behavior_quiz') {
+        openBehaviorQuiz(task.id);
+      } else if (action === 'open_deck') {
+        openDeck(task.primaryAction.deckId, task.id, 'task');
+      } else if (action === 'open_asset') {
+        openAsset(task.primaryAction.assetId, task.id, 'task');
+      } else if (action === 'slider_checkin') {
+        openCheckin(task.id);
+      } else if (action === 'open_reset') {
+        state.resetModal.open = true;
+      } else if (action === 'action_complete') {
+        completeTask(task.id, { source: 'manual' });
+        toast('Task marked complete.');
+      }
+      commit();
+    }
+
+    function resetDemoCompletely() {
+      state = createDefaultState();
+      runStepOnEnter(getCurrentStep());
+      commit();
+      toast('Demo reset.');
+    }
+
+    function stopResetTimer() {
+      if (resetTimer) {
+        clearInterval(resetTimer);
+        resetTimer = null;
+      }
+      state.resetModal.running = false;
+    }
+
+    function startResetTimer() {
+      stopResetTimer();
+      state.resetModal.running = true;
+      state.resetModal.secondsLeft = RESET_SECONDS;
+      resetTimer = setInterval(function () {
+        state.resetModal.secondsLeft -= 1;
+        if (state.resetModal.secondsLeft <= 0) {
+          stopResetTimer();
+          state.resetModal.secondsLeft = 0;
+          completeTask('task_reset', { reset: true });
+          toast('60-second reset complete.');
+        }
+        commit();
+      }, 1000);
+      commit();
+    }
+
+    function commit(withRender) {
+      if (withRender === undefined) withRender = true;
+      saveState();
+      if (withRender) render();
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderTop() {
+      var top = document.getElementById('topPanel');
+      var persona = state.personaId ? PERSONAS[state.personaId] : null;
+      top.innerHTML = ''
+        + '<div class="headline">'
+        + '  <div>'
+        + '    <h1>' + escapeHtml(phaseLabel(state.activePhase)) + ' - ' + escapeHtml(CONTENT.procedure.name) + '</h1>'
+        + '    <div class="sub">Standalone walkthrough mode (no backend). Patient ' + escapeHtml(CONTENT.procedure.patientInitials || 'RV') + '</div>'
+        + '  </div>'
+        + '  <button class="btn ghost" data-action="reset-demo">Reset demo</button>'
+        + '</div>'
+        + '<div class="chips">'
+        + '  <button class="chip ' + (state.activePhase === 'preop' ? 'active' : '') + '" data-action="switch-phase" data-phase="preop">Pre-Op Day</button>'
+        + '  <button class="chip ' + (state.activePhase === 'recovery' ? 'active' : '') + '" data-action="switch-phase" data-phase="recovery">Post-Op Day 2</button>'
+        + '</div>'
+        + '<div class="tabs">'
+        + '  <button class="tab ' + (state.activeTab === 'today' ? 'active' : '') + '" data-action="switch-tab" data-tab="today">Today</button>'
+        + '  <button class="tab ' + (state.activeTab === 'journey' ? 'active' : '') + '" data-action="switch-tab" data-tab="journey">Journey</button>'
+        + '  <button class="tab ' + (state.activeTab === 'library' ? 'active' : '') + '" data-action="switch-tab" data-tab="library">Library</button>'
+        + '</div>'
+        + '<div class="persona">'
+        + '  <span class="tiny">Persona:</span>'
+        + (persona ? '<span class="pill">' + escapeHtml(persona.title) + '</span><span class="tiny">' + escapeHtml(persona.planTone) + '</span>' : '<span class="tiny">Not set yet.</span>')
+        + '</div>';
+    }
+
+    function renderToday() {
+      var tasks = currentPhaseTasks();
+      var pending = pendingTaskCount(tasks);
+      var summary = pending + ' of ' + tasks.length + ' tasks remaining';
+      var heroClass = 'today-hero' + (state.highlightKey === 'todayPlan' ? ' highlight' : '');
+
+      var html = ''
+        + '<div class="today-wrap">'
+        + '  <div class="' + heroClass + '">'
+        + '    <div class="hero-row">'
+        + '      <div>'
+        + '        <div class="tiny">Today Plan</div>'
+        + '        <div><strong>' + escapeHtml(summary) + '</strong></div>'
+        + '      </div>'
+        + '      <button class="btn ghost" data-action="open-quiz">Take quiz</button>'
+        + '    </div>'
+        + '    <div class="tiny">' + escapeHtml(todayPlanSummaryText()).replace(/\n/g, ' | ') + '</div>'
+        + '  </div>'
+        + '  <div class="tasks">';
+
+      tasks.forEach(function (task) {
+        var done = !!(state.taskStatus[task.id] && state.taskStatus[task.id].completedAt);
+        html += ''
+          + '<article class="task ' + (done ? 'done' : '') + '">'
+          + '  <div class="task-top">'
+          + '    <div>'
+          + '      <div class="task-title">' + escapeHtml(task.title) + '</div>'
+          + '      <div class="task-meta"><span>' + escapeHtml(task.label || task.category || 'Task') + '</span><span>' + escapeHtml(task.due || task.eta || '') + '</span></div>'
+          + '    </div>'
+          + '    <span class="kbd">' + (done ? 'Done' : 'Open') + '</span>'
+          + '  </div>'
+          + '  <div class="task-reason">' + escapeHtml(task.desc || task.reason || '') + '</div>'
+          + '  <div>'
+          + '    <button class="btn ' + (done ? 'ghost' : 'primary') + '" data-action="task-primary" data-task-id="' + escapeHtml(task.id) + '">' + escapeHtml((task.primaryAction && task.primaryAction.button) || (done ? 'Review' : 'Start')) + '</button>'
+          + (task.aiPrompt ? ' <button class="btn link" data-action="assistant-prompt" data-prompt="' + escapeHtml(task.aiPrompt) + '">Ask SARA</button>' : '')
+          + '  </div>'
+          + '</article>';
+      });
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderJourney() {
+      var journey = CONTENT.journey || {};
+      var today = {
+        title: state.activePhase === 'recovery' ? 'Post-op day 2' : 'Pre-op day',
+        desc: state.activePhase === 'recovery'
+          ? 'Pain check, wound guide, and PT focus.'
+          : 'Checklist, confidence check-in, and prep tasks.'
+      };
+      var html = ''
+        + '<div class="journey-wrap">'
+        + '  <div class="tiny">Current timeline context is synced to walkthrough steps.</div>'
+        + '  <div class="journey-grid">'
+        + '    <section class="journey-col"><h3>Completed</h3>';
+      (journey.completed || []).forEach(function (item) {
+        html += '<div class="journey-item"><strong>' + escapeHtml(item.date || '') + ' - ' + escapeHtml(item.title || '') + '</strong><div class="muted">' + escapeHtml(item.desc || '') + '</div></div>';
+      });
+      html += '</section>';
+
+      html += '<section class="journey-col"><h3>Today</h3>'
+        + '<div class="journey-item"><strong>' + escapeHtml(today.title) + '</strong><div class="muted">' + escapeHtml(today.desc) + '</div></div>'
+        + '</section>';
+
+      html += '<section class="journey-col"><h3>Upcoming</h3>';
+      (journey.upcoming || []).forEach(function (item) {
+        html += '<div class="journey-item"><strong>' + escapeHtml(item.date || '') + ' - ' + escapeHtml(item.title || '') + '</strong><div class="muted">' + escapeHtml(item.desc || '') + '</div></div>';
+      });
+      html += '</section>';
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderLibrary() {
+      var query = String(state.libraryQuery || '').trim().toLowerCase();
+      var typeFilter = state.libraryType;
+      var list = (CONTENT.assets || []).filter(function (asset) {
+        if (typeFilter !== 'all' && String(asset.type || '').toLowerCase() !== typeFilter) return false;
+        if (!query) return true;
+        var hay = [asset.title, asset.summary, asset.meta].join(' ').toLowerCase();
+        return hay.indexOf(query) >= 0;
+      });
+
+      var html = ''
+        + '<div class="library-wrap">'
+        + '  <div class="library-tools">'
+        + '    <input class="input" id="libraryQueryInput" placeholder="Search resources" value="' + escapeHtml(state.libraryQuery) + '" />'
+        + '    <select class="select" id="libraryTypeSelect">'
+        + '      <option value="all" ' + (typeFilter === 'all' ? 'selected' : '') + '>All types</option>'
+        + '      <option value="pdf" ' + (typeFilter === 'pdf' ? 'selected' : '') + '>PDF</option>'
+        + '      <option value="video" ' + (typeFilter === 'video' ? 'selected' : '') + '>Video</option>'
+        + '      <option value="tour" ' + (typeFilter === 'tour' ? 'selected' : '') + '>Tour</option>'
+        + '    </select>'
+        + '  </div>'
+        + '  <div class="library-list">';
+
+      list.forEach(function (asset) {
+        html += ''
+          + '<article class="asset">'
+          + '  <div class="asset-top"><div class="asset-title">' + escapeHtml(asset.title) + '</div><span class="kbd">' + escapeHtml(String(asset.type || 'pdf').toUpperCase()) + '</span></div>'
+          + '  <div class="asset-meta">' + escapeHtml(asset.meta || '') + ' · ' + escapeHtml(phaseLabel(normalizePhase(asset.phase || 'preop')) || '') + '</div>'
+          + '  <div class="muted">' + escapeHtml(asset.summary || '') + '</div>'
+          + '  <div><button class="btn ghost" data-action="open-asset" data-asset-id="' + escapeHtml(asset.id) + '">Open resource</button></div>'
+          + '</article>';
+      });
+
+      if (!list.length) {
+        html += '<div class="muted">No resources match this filter.</div>';
+      }
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderView() {
+      var panel = document.getElementById('viewPanel');
+      if (state.activeTab === 'journey') {
+        panel.innerHTML = renderJourney();
+      } else if (state.activeTab === 'library') {
+        panel.innerHTML = renderLibrary();
+      } else {
+        panel.innerHTML = renderToday();
+      }
+    }
+
+    function renderDemoPanel() {
+      var panel = document.getElementById('demoPanel');
+      var step = getCurrentStep();
+      var stepIndex = getStepIndex(state.demoStepId);
+      var total = (PATHWAY.steps || []).length;
+      var promptsHtml = '';
+      (step && step.agentSuggestedUtterances ? step.agentSuggestedUtterances : []).forEach(function (prompt) {
+        promptsHtml += '<button class="btn ghost" data-action="assistant-prompt" data-prompt="' + escapeHtml(prompt) + '">Send: ' + escapeHtml(prompt) + '</button>';
+      });
+
+      var options = '';
+      (PATHWAY.steps || []).forEach(function (entry) {
+        options += '<option value="' + escapeHtml(entry.id) + '" ' + (entry.id === state.demoStepId ? 'selected' : '') + '>' + escapeHtml(entry.title) + '</option>';
+      });
+
+      panel.innerHTML = ''
+        + '<div class="demo-head"><strong>Demo Control Panel</strong><div class="tiny">' + escapeHtml(PATHWAY.title || 'Pathway') + '</div></div>'
+        + '<div class="demo-body">'
+        + '  <div class="demo-actions">'
+        + '    <button class="btn ghost" data-action="step-prev">Prev</button>'
+        + '    <button class="btn primary" data-action="step-next">Next</button>'
+        + '    <button class="btn ghost" data-action="step-reset">Reset</button>'
+        + '  </div>'
+        + '  <label class="tiny" for="stepSelect">Jump to step</label>'
+        + '  <select class="select" id="stepSelect">' + options + '</select>'
+        + '  <div class="step-box">'
+        + '    <div><strong>Step ' + (stepIndex + 1) + ' of ' + total + '</strong></div>'
+        + '    <div>' + escapeHtml(step ? step.title : 'N/A') + '</div>'
+        + '    <div class="tiny">' + escapeHtml(step ? step.narration : '') + '</div>'
+        + '  </div>'
+        + '  <label class="tiny"><input type="checkbox" id="autoRunCheckbox" ' + (state.autoRun ? 'checked' : '') + ' /> Auto-run step actions</label>'
+        + '  <button class="btn ghost" data-action="run-step">Run step actions</button>'
+        + '  <div class="tiny">Agent prompts</div>'
+        + '  <div class="demo-prompts">' + promptsHtml + '</div>'
+        + '  <div class="tiny">Hard controls</div>'
+        + '  <div class="hard-controls">'
+        + '    <button class="btn ghost" data-action="open-deck" data-deck-id="deck_checklist">Open checklist</button>'
+        + '    <button class="btn ghost" data-action="open-checkin">Start check-in</button>'
+        + '    <button class="btn ghost" data-action="library-pt">Library: PT</button>'
+        + '    <button class="btn ghost" data-action="open-quiz">Open behavior quiz</button>'
+        + '  </div>'
+        + '</div>';
+    }
+
+    function renderChatPanel() {
+      var panel = document.getElementById('chatPanel');
+      var messages = '';
+      (state.chatMessages || []).forEach(function (msg) {
+        messages += '<div class="msg ' + (msg.role === 'user' ? 'user' : 'assistant') + '">' + escapeHtml(msg.text).replace(/\n/g, '<br/>') + '</div>';
+      });
+      panel.innerHTML = ''
+        + '<div class="chat-head"><strong>Local Assistant</strong><div class="tiny">Deterministic fallback, no network calls.</div></div>'
+        + '<div class="chat-body">'
+        + '  <div class="chat-log" id="chatLog">' + messages + '</div>'
+        + '  <form class="chat-form" id="chatForm">'
+        + '    <input class="input" id="chatInput" placeholder="Try: What should I do today?" />'
+        + '    <button class="btn primary" type="submit">Send</button>'
+        + '  </form>'
+        + '</div>';
+      var log = document.getElementById('chatLog');
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function renderModal() {
+      var shell = document.getElementById('modalShell');
+      var html = '';
+
+      if (state.quizModal.open) {
+        var personaNote = state.personaId ? 'Current persona: ' + PERSONAS[state.personaId].title : 'No persona selected yet.';
+        html = ''
+          + '<article class="modal">'
+          + '  <button class="close-x" data-action="close-modal">x</button>'
+          + '  <h2 style="margin:0;">Behavior Quiz</h2>'
+          + '  <div class="muted">Question-based personalization for demo tone and planning style.</div>'
+          + '  <div class="tiny">' + escapeHtml(personaNote) + '</div>'
+          + '  <div class="quiz-grid">';
+        QUIZ.forEach(function (q) {
+          html += '<section class="quiz-item"><strong>' + escapeHtml(q.prompt) + '</strong><div class="quiz-options">';
+          q.options.forEach(function (opt) {
+            var checked = state.quizAnswers[q.id] === opt.id ? 'checked' : '';
+            html += ''
+              + '<label class="quiz-option">'
+              + '  <input type="radio" name="quiz_' + escapeHtml(q.id) + '" value="' + escapeHtml(opt.id) + '" data-action="quiz-answer" data-question-id="' + escapeHtml(q.id) + '" ' + checked + ' />'
+              + '  <span>' + escapeHtml(opt.text) + '</span>'
+              + '</label>';
+          });
+          html += '</div></section>';
+        });
+        html += ''
+          + '  </div>'
+          + '  <div><button class="btn primary" data-action="submit-quiz">Save profile</button></div>'
+          + '</article>';
+      } else if (state.deckModal.open) {
+        var deckId = state.deckModal.deckId;
+        var slides = (CONTENT.decks && CONTENT.decks[deckId]) || [];
+        var asset = resolveAssetForDeck(deckId, state.deckModal.assetId);
+        var slide = slides[state.deckModal.index] || null;
+        var hasOriginal = !!(asset && (asset.original || asset.summary));
+        var stepText = slides.length ? ('Slide ' + (state.deckModal.index + 1) + ' of ' + slides.length) : 'No card slides';
+
+        html = ''
+          + '<article class="modal">'
+          + '  <button class="close-x" data-action="close-modal">x</button>'
+          + '  <h2 style="margin:0;">' + escapeHtml(asset ? asset.title : deckId) + '</h2>'
+          + '  <div class="tiny">' + escapeHtml(stepText) + '</div>';
+
+        if (slides.length && hasOriginal) {
+          html += ''
+            + '<div class="chips">'
+            + '  <button class="chip ' + (state.deckModal.mode === 'cards' ? 'active' : '') + '" data-action="deck-mode" data-mode="cards">Summary</button>'
+            + '  <button class="chip ' + (state.deckModal.mode === 'original' ? 'active' : '') + '" data-action="deck-mode" data-mode="original">Original</button>'
+            + '</div>';
+        }
+
+        if (state.deckModal.mode === 'cards' && slides.length) {
+          html += '<section class="deck-slide">'
+            + '<h3 style="margin:0;">' + escapeHtml(slide.title || '') + '</h3>'
+            + '<div class="muted">' + escapeHtml(slide.lede || '') + '</div>'
+            + '<ul class="bullet-list">';
+          (slide.bullets || []).forEach(function (bullet) {
+            html += '<li>' + escapeHtml(bullet) + '</li>';
+          });
+          html += '</ul></section>';
+        } else {
+          var original = (asset && asset.original) || null;
+          html += '<section class="deck-slide">';
+          if (original && Array.isArray(original.sections) && original.sections.length) {
+            html += '<h3 style="margin:0;">' + escapeHtml(original.title || asset.title || 'Guide') + '</h3>';
+            original.sections.forEach(function (section) {
+              html += '<div class="original-section"><strong>' + escapeHtml(section.heading || 'Section') + '</strong><div class="muted">' + escapeHtml(section.body || '') + '</div></div>';
+            });
+          } else {
+            html += '<div class="muted">' + escapeHtml((asset && asset.summary) || 'No guide content available yet.') + '</div>';
+          }
+          html += '</section>';
+        }
+
+        html += ''
+          + '  <div class="deck-nav">'
+          + '    <button class="btn ghost" data-action="deck-prev" ' + (state.deckModal.index <= 0 ? 'disabled' : '') + '>Back</button>'
+          + '    <div class="tiny" style="text-align:center;">' + escapeHtml(stepText) + '</div>'
+          + '    <button class="btn primary" data-action="deck-next" ' + (slides.length && state.deckModal.index < slides.length - 1 ? '' : 'disabled') + '>Next</button>'
+          + '  </div>'
+          + '  <div><button class="btn primary" data-action="deck-understood">Mark as understood</button></div>'
+          + '</article>';
+      } else if (state.assetModal.open) {
+        var activeAsset = assetsById[state.assetModal.assetId];
+        var preview = '';
+        if (activeAsset && activeAsset.url) {
+          preview = '<a class="btn ghost" href="' + escapeHtml(activeAsset.url) + '" target="_blank" rel="noreferrer">Open source link</a>';
+        }
+        html = ''
+          + '<article class="modal">'
+          + '  <button class="close-x" data-action="close-modal">x</button>'
+          + '  <h2 style="margin:0;">' + escapeHtml(activeAsset ? activeAsset.title : 'Asset') + '</h2>'
+          + '  <div class="muted">' + escapeHtml(activeAsset ? (activeAsset.summary || '') : '') + '</div>'
+          + '  <div class="deck-slide">' + preview + '</div>'
+          + '  <div><button class="btn primary" data-action="asset-understood">Mark as understood</button></div>'
+          + '</article>';
+      } else if (state.checkinModal.open) {
+        var checkTask = tasksById[state.checkinModal.taskId] || { title: 'Check-in' };
+        html = ''
+          + '<article class="modal">'
+          + '  <button class="close-x" data-action="close-modal">x</button>'
+          + '  <h2 style="margin:0;">' + escapeHtml(checkTask.title) + '</h2>'
+          + '  <div class="muted">' + escapeHtml(checkTask.desc || '') + '</div>'
+          + '  <div class="checkin-box">'
+          + '    <label class="slider-wrap">'
+          + '      <span>Rate current status (1 to 5)</span>'
+          + '      <input type="range" min="1" max="5" step="1" value="' + Number(state.checkinModal.value || 3) + '" id="checkinSlider" />'
+          + '      <strong id="checkinSliderValue">' + Number(state.checkinModal.value || 3) + '</strong>'
+          + '    </label>'
+          + '    <label class="slider-wrap">'
+          + '      <span>Notes (optional)</span>'
+          + '      <textarea class="input" id="checkinNote" rows="3" placeholder="Anything to flag?">' + escapeHtml(state.checkinModal.note || '') + '</textarea>'
+          + '    </label>'
+          + '    <div><button class="btn primary" data-action="submit-checkin">Save check-in</button></div>'
+          + '  </div>'
+          + '</article>';
+      } else if (state.resetModal.open) {
+        var secondsLeft = Number(state.resetModal.secondsLeft || RESET_SECONDS);
+        var progress = Math.round(((RESET_SECONDS - secondsLeft) / RESET_SECONDS) * 100);
+        if (progress < 0) progress = 0;
+        if (progress > 100) progress = 100;
+        html = ''
+          + '<article class="modal">'
+          + '  <button class="close-x" data-action="close-modal">x</button>'
+          + '  <h2 style="margin:0;">60-Second Reset</h2>'
+          + '  <div class="muted">Breathe in for 4, hold for 4, out for 6. Keep shoulders relaxed.</div>'
+          + '  <div class="deck-slide">'
+          + '    <div><strong>' + secondsLeft + 's remaining</strong></div>'
+          + '    <div style="height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;">'
+          + '      <div style="height:100%;width:' + progress + '%;background:#0ea5e9;"></div>'
+          + '    </div>'
+          + '  </div>'
+          + '  <div>'
+          + '    <button class="btn ' + (state.resetModal.running ? 'ghost' : 'primary') + '" data-action="toggle-reset">' + (state.resetModal.running ? 'Pause' : 'Start reset') + '</button>'
+          + '  </div>'
+          + '</article>';
+      }
+
+      shell.innerHTML = html;
+      shell.classList.toggle('show', !!html);
+    }
+
+    function render() {
+      renderTop();
+      renderView();
+      renderDemoPanel();
+      renderChatPanel();
+      renderModal();
+    }
+
+    document.addEventListener('click', function (event) {
+      var target = event.target.closest('[data-action]');
+      if (!target) return;
+      var action = target.getAttribute('data-action');
+
+      if (action === 'switch-tab') {
+        state.activeTab = target.getAttribute('data-tab') || 'today';
+        commit();
+      } else if (action === 'switch-phase') {
+        state.activePhase = normalizePhase(target.getAttribute('data-phase') || 'preop');
+        commit();
+      } else if (action === 'task-primary') {
+        var taskId = target.getAttribute('data-task-id');
+        taskPrimaryAction(tasksById[taskId]);
+      } else if (action === 'assistant-prompt') {
+        var prompt = target.getAttribute('data-prompt') || '';
+        sendAssistantPrompt(prompt, true);
+      } else if (action === 'reset-demo') {
+        resetDemoCompletely();
+      } else if (action === 'open-quiz') {
+        openBehaviorQuiz('task_behavior_quiz');
+        commit();
+      } else if (action === 'open-asset') {
+        openAsset(target.getAttribute('data-asset-id'), null, 'library');
+        commit();
+      } else if (action === 'open-deck') {
+        openDeck(target.getAttribute('data-deck-id'), null, 'manual');
+        commit();
+      } else if (action === 'open-checkin') {
+        openCheckin();
+        commit();
+      } else if (action === 'library-pt') {
+        state.activeTab = 'library';
+        state.activePhase = 'recovery';
+        state.libraryQuery = 'PT';
+        commit();
+      } else if (action === 'step-prev') {
+        prevStep();
+      } else if (action === 'step-next') {
+        nextStep();
+      } else if (action === 'step-reset') {
+        resetPathway();
+      } else if (action === 'run-step') {
+        runStepOnEnter(getCurrentStep());
+        commit();
+      } else if (action === 'close-modal') {
+        closeOverlays();
+        commit();
+      } else if (action === 'deck-prev') {
+        state.deckModal.index = Math.max(0, state.deckModal.index - 1);
+        commit();
+      } else if (action === 'deck-next') {
+        var slides = (CONTENT.decks && CONTENT.decks[state.deckModal.deckId]) || [];
+        state.deckModal.index = Math.min(slides.length - 1, state.deckModal.index + 1);
+        commit();
+      } else if (action === 'deck-mode') {
+        state.deckModal.mode = target.getAttribute('data-mode') || 'cards';
+        commit();
+      } else if (action === 'deck-understood') {
+        if (state.deckModal.taskId) completeTask(state.deckModal.taskId, { understood: true, deckId: state.deckModal.deckId });
+        state.deckModal.open = false;
+        toast('Marked as understood.');
+        commit();
+      } else if (action === 'asset-understood') {
+        if (state.assetModal.taskId) completeTask(state.assetModal.taskId, { understood: true, assetId: state.assetModal.assetId });
+        state.assetModal.open = false;
+        toast('Marked as understood.');
+        commit();
+      } else if (action === 'submit-checkin') {
+        submitCheckin();
+        commit();
+      } else if (action === 'submit-quiz') {
+        submitBehaviorQuiz();
+        commit();
+      } else if (action === 'quiz-answer') {
+        var qid = target.getAttribute('data-question-id');
+        if (qid) state.quizAnswers[qid] = target.value;
+        commit();
+      } else if (action === 'toggle-reset') {
+        if (state.resetModal.running) {
+          stopResetTimer();
+        } else {
+          startResetTimer();
+        }
+        commit();
+      }
+    });
+
+    document.addEventListener('change', function (event) {
+      var target = event.target;
+      if (target.id === 'stepSelect') {
+        jumpToStep(target.value);
+      } else if (target.id === 'autoRunCheckbox') {
+        state.autoRun = !!target.checked;
+        commit();
+      } else if (target.id === 'libraryTypeSelect') {
+        state.libraryType = target.value || 'all';
+        commit();
+      } else if (target.id === 'checkinSlider') {
+        state.checkinModal.value = Number(target.value || 3);
+        commit();
+      } else if (target.getAttribute('data-action') === 'quiz-answer') {
+        var qid = target.getAttribute('data-question-id');
+        if (qid) state.quizAnswers[qid] = target.value;
+        commit();
+      }
+    });
+
+    document.addEventListener('input', function (event) {
+      var target = event.target;
+      if (target.id === 'libraryQueryInput') {
+        state.libraryQuery = target.value || '';
+        commit();
+      } else if (target.id === 'checkinNote') {
+        state.checkinModal.note = target.value || '';
+        commit(false);
+      }
+    });
+
+    document.addEventListener('submit', function (event) {
+      if (event.target && event.target.id === 'chatForm') {
+        event.preventDefault();
+        var input = document.getElementById('chatInput');
+        var value = input ? input.value : '';
+        if (!value.trim()) return;
+        sendAssistantPrompt(value, true);
+        input.value = '';
+      }
+    });
+
+    runStepOnEnter(getCurrentStep());
+    render();
+  </script>
+</body>
+</html>
