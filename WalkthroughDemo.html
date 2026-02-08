@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SARA ACL Demo - Standalone</title>
+  <title>SARA ACL Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -153,6 +153,27 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hero-link {
+      color: var(--acl-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
     }
 
     .tiny {
@@ -638,9 +659,81 @@
 
     .headline h1 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 34px;
+      font-size: 50px;
       line-height: 1.06;
       letter-spacing: -0.01em;
+    }
+
+    .procedure-name {
+      font-size: 32px;
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+    }
+
+    .progress-wrap {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 410px;
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .progress-percent {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--acl-primary);
+      border: 1px solid color-mix(in srgb, var(--acl-primary) 32%, transparent);
+      background: color-mix(in srgb, var(--acl-primary) 18%, transparent);
+    }
+
+    .progress-text {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--acl-muted);
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      border: 1px solid var(--acl-border-subtle);
+      background: color-mix(in srgb, var(--acl-border) 80%, transparent);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--acl-primary), color-mix(in srgb, var(--acl-primary) 35%, var(--acl-success)));
+      transition: width 0.25s ease;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .phase-line {
+      font-size: 13px;
+      color: var(--acl-muted);
+      margin-top: 4px;
     }
 
     .sub,
@@ -702,6 +795,14 @@
       padding-bottom: 1px;
     }
 
+    .btn:disabled,
+    button:disabled {
+      opacity: 0.46;
+      cursor: not-allowed;
+      pointer-events: none;
+      box-shadow: none !important;
+    }
+
     #viewPanel {
       overflow: hidden;
     }
@@ -711,6 +812,19 @@
     .library-wrap {
       padding: 18px;
       gap: 14px;
+    }
+
+    .today-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .today-main,
+    .today-side {
+      display: grid;
+      gap: 12px;
     }
 
     .today-hero,
@@ -752,15 +866,15 @@
 
     .task-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 27px;
-      line-height: 1.1;
+      font-size: 20px;
+      line-height: 1.14;
       letter-spacing: -0.01em;
     }
 
     .task-meta {
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
     }
 
@@ -771,9 +885,130 @@
     }
 
     .task-reason {
-      font-size: 15px;
+      font-size: 14px;
       color: #334155;
       line-height: 1.45;
+    }
+
+    .sara-panel {
+      border: 1px solid color-mix(in srgb, var(--acl-primary) 45%, var(--acl-border));
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(15, 23, 42, 0.2));
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sara-kicker {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--acl-primary);
+    }
+
+    .sara-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .sara-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .sara-why {
+      margin: 4px 0 0;
+      color: #475569;
+      font-size: 15px;
+    }
+
+    .sara-next {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .sara-ask {
+      color: var(--acl-primary);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px dashed color-mix(in srgb, var(--acl-primary) 35%, transparent);
+      width: fit-content;
+      padding-bottom: 1px;
+    }
+
+    .help-card {
+      border: 1px solid var(--acl-border);
+      border-radius: 18px;
+      background: var(--acl-card);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      box-shadow: var(--acl-shadow-soft);
+    }
+
+    .help-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .help-sub {
+      color: var(--acl-muted);
+      font-size: 14px;
+      margin-top: -2px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--acl-border-subtle);
+      background: var(--acl-surface);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 4px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .faq-topic {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--acl-muted);
+      font-weight: 700;
+    }
+
+    .faq-question {
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--acl-text);
+    }
+
+    .prompt-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .prompt-chip {
+      border-radius: 999px;
+      border: 1px solid var(--acl-border-strong);
+      background: var(--acl-pill-bg);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--acl-text);
     }
 
     .kbd {
@@ -791,6 +1026,225 @@
     .panel-side {
       top: 20px;
       gap: 14px;
+    }
+
+    .chat-fab {
+      position: fixed;
+      bottom: 28px;
+      right: max(24px, calc(50% - 560px + 24px));
+      background: var(--acl-primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 12px 24px color-mix(in srgb, var(--acl-primary) 45%, transparent);
+      cursor: pointer;
+      z-index: 220;
+    }
+
+    .chat-popover {
+      position: fixed;
+      inset: 0;
+      z-index: 210;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .chat-popover.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .chat-popover-backdrop {
+      position: absolute;
+      inset: 0;
+      border: none;
+      background: var(--acl-overlay-strong);
+      cursor: pointer;
+    }
+
+    .chat-popover-card {
+      position: relative;
+      width: min(520px, 92%);
+      height: min(72vh, 620px);
+      background: var(--acl-card);
+      border-radius: 24px;
+      border: 1px solid var(--acl-border);
+      box-shadow: var(--acl-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .chat-popover-header {
+      position: relative;
+      z-index: 3;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--acl-border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--acl-surface-strong);
+    }
+
+    .chat-popover-header h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      font-family: inherit;
+      letter-spacing: normal;
+    }
+
+    .chat-popover-header p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--acl-muted);
+    }
+
+    .chat-close {
+      border: none;
+      background: var(--acl-pill-bg);
+      color: var(--acl-text);
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .chat-popover-body {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      padding: 0;
+      background: var(--acl-surface);
+    }
+
+    .vapi-host {
+      position: absolute;
+      inset: 12px;
+      pointer-events: none;
+    }
+
+    .vapi-host .vapi-widget-wrapper {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+      overflow: hidden;
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .vapi-host .vapi-widget-wrapper > div {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      pointer-events: none;
+    }
+
+    .vapi-host .vapi-widget-wrapper > div > div,
+    .vapi-host .vapi-widget-wrapper iframe {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+    }
+
+    .chat-popover.show .vapi-host,
+    .chat-popover.show .vapi-host .vapi-widget-wrapper,
+    .chat-popover.show .vapi-host .vapi-widget-wrapper > div,
+    .chat-popover.show .vapi-host .vapi-widget-wrapper > div > div,
+    .chat-popover.show .vapi-host .vapi-widget-wrapper iframe {
+      pointer-events: auto;
+    }
+
+    .vapi-host .vapi-widget-wrapper *,
+    .vapi-host .vapi-widget-wrapper *::before,
+    .vapi-host .vapi-widget-wrapper *::after {
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+
+    .vapi-host .vapi-widget-wrapper > div * {
+      pointer-events: auto;
+    }
+
+    .vapi-host .vapi-widget-wrapper button[aria-label="Close"],
+    .vapi-host .vapi-widget-wrapper button[title="Close"],
+    .vapi-host .vapi-widget-wrapper button[aria-label="Close chat"],
+    .vapi-host .vapi-widget-wrapper button[title="Close chat"],
+    .vapi-host .vapi-widget-wrapper button[aria-label="Close conversation"],
+    .vapi-host .vapi-widget-wrapper button[title="Close conversation"] {
+      display: none !important;
+    }
+
+    body:not([data-vapi-open="true"]) .vapi-widget-wrapper {
+      display: none;
+    }
+
+    .chat-popover-prompts {
+      position: absolute;
+      inset: auto 16px 16px 16px;
+      z-index: 2;
+      border-radius: 16px;
+      border: 1px solid var(--acl-border-subtle);
+      background: var(--acl-surface-strong);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .chat-prompt-chip {
+      border-radius: 12px;
+      border: 1px solid var(--acl-border-strong);
+      background: var(--acl-surface);
+      color: var(--acl-text);
+      padding: 8px 10px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .chat-prompt-chip:hover {
+      border-color: var(--acl-primary);
+      color: var(--acl-primary);
+    }
+
+    .chat-popover-error {
+      position: absolute;
+      inset: 16px 16px auto 16px;
+      z-index: 2;
+      border-radius: 12px;
+      border: 1px dashed var(--acl-border-strong);
+      background: var(--acl-surface);
+      color: var(--acl-muted);
+      font-size: 12px;
+      padding: 12px;
+      display: none;
+    }
+
+    .chat-popover-error.has-text {
+      display: block;
+    }
+
+    .chat-popover-error.is-error {
+      border-style: solid;
+      border-color: rgba(248, 113, 113, 0.4);
+      background: rgba(248, 113, 113, 0.16);
+      color: #fca5a5;
     }
 
     .demo-head,
@@ -853,7 +1307,7 @@
 
     .modal h2 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 38px;
+      font-size: 48px;
       line-height: 1.05;
       letter-spacing: -0.01em;
     }
@@ -877,7 +1331,7 @@
     .deck-slide h3 {
       margin: 0;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 31px;
+      font-size: 26px;
       line-height: 1.06;
       letter-spacing: -0.01em;
     }
@@ -900,40 +1354,182 @@
       border-radius: 16px;
     }
 
-    .quiz-grid {
+    .quiz-modal {
+      width: min(860px, 96vw);
+      max-height: 88vh;
+      padding: 14px;
+    }
+
+    .quiz-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 12px;
+      padding: 2px 4px 8px;
+      padding-right: 42px;
     }
 
-    .quiz-item {
-      border-radius: 14px;
-      padding: 12px;
-      border-color: color-mix(in srgb, var(--acl-primary) 20%, var(--acl-border));
-      background: #fff;
+    .quiz-modal-title {
+      margin: 0 0 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--acl-text);
     }
 
-    .quiz-item strong {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px;
+    .quiz-modal-sub {
+      margin: 0;
+      color: var(--acl-muted);
+      font-size: 14px;
     }
 
-    .quiz-option {
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 15px;
+    .quiz-persona-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--acl-muted);
+    }
+
+    .behavior-quiz-lite {
+      display: grid;
+      gap: 12px;
+      padding: 0 4px 4px;
+    }
+
+    .behavior-progress-wrap {
+      margin-bottom: 2px;
+    }
+
+    .behavior-progress {
+      position: relative;
+      background: color-mix(in srgb, #4c6ef5 22%, transparent);
+      height: 8px;
+      border-radius: 999px;
+      overflow: visible;
+    }
+
+    .behavior-progress-bar {
+      position: absolute;
+      inset: 0;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3355dc 0%, #4c6ef5 100%);
+      transition: width 0.3s ease;
+    }
+
+    .behavior-progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #4c6ef5;
+      box-shadow: 0 0 10px rgba(76, 110, 245, 0.4);
+      transform: translate(50%, -50%);
+    }
+
+    .behavior-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--acl-muted);
+      margin-top: 8px;
+    }
+
+    .behavior-progress-meta strong {
+      color: var(--acl-text);
+      font-weight: 700;
+    }
+
+    .behavior-card {
       background: var(--acl-card);
-      border-color: color-mix(in srgb, var(--acl-primary) 22%, var(--acl-border));
-      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid color-mix(in srgb, #0f172a 10%, transparent);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      margin: 0;
+      display: grid;
+      gap: 10px;
     }
 
-    .quiz-option:hover {
-      border-color: color-mix(in srgb, var(--acl-primary) 46%, var(--acl-border));
-      background: color-mix(in srgb, var(--acl-primary) 8%, var(--acl-card));
+    .behavior-question-title {
+      font-size: 22px;
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
     }
 
-    .quiz-option:has(input:checked) {
-      border-color: color-mix(in srgb, var(--acl-primary) 62%, var(--acl-border));
-      background: color-mix(in srgb, var(--acl-primary) 12%, var(--acl-card));
-      box-shadow: 0 8px 22px color-mix(in srgb, var(--acl-primary) 20%, transparent);
+    .behavior-question-helper {
+      font-size: 13px;
+      color: var(--acl-muted);
+      margin: 0 0 2px;
+      max-width: 580px;
+    }
+
+    .behavior-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .behavior-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid color-mix(in srgb, #0f172a 12%, transparent);
+      border-radius: 14px;
+      padding: 11px 12px;
+      cursor: pointer;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      color: var(--acl-text);
+      background: transparent;
+    }
+
+    .behavior-option input[type='radio'] {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin: 0;
+      flex-shrink: 0;
+      accent-color: #4c6ef5;
+    }
+
+    .behavior-option span {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .behavior-option:hover {
+      border-color: #4c6ef5;
+      box-shadow: 0 8px 22px rgba(76, 110, 245, 0.13);
+      background: rgba(76, 110, 245, 0.08);
+    }
+
+    .behavior-option.selected {
+      border-color: #4c6ef5;
+      background: rgba(76, 110, 245, 0.14);
+      box-shadow: 0 10px 24px rgba(76, 110, 245, 0.18);
+    }
+
+    .behavior-option.selected span {
+      font-weight: 600;
+    }
+
+    .behavior-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .behavior-actions-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .input,
@@ -960,6 +1556,13 @@
       .panel-side {
         position: static;
       }
+      .today-grid {
+        grid-template-columns: 1fr;
+      }
+      .headline h1,
+      .procedure-name {
+        font-size: 34px;
+      }
     }
 
     @media (max-width: 760px) {
@@ -976,12 +1579,48 @@
       .headline h1 {
         font-size: 26px;
       }
+      .procedure-name {
+        font-size: 24px;
+      }
       .task-title {
         font-size: 22px;
       }
       .modal h2,
       .deck-slide h3 {
-        font-size: 28px;
+        font-size: 30px;
+      }
+      .quiz-modal-title {
+        font-size: 24px;
+      }
+      .behavior-question-title {
+        font-size: 19px;
+      }
+      .behavior-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .behavior-actions-right {
+        justify-content: flex-end;
+      }
+      .chat-fab {
+        font-size: 12px;
+        padding: 10px 14px;
+        right: 12px;
+        bottom: 12px;
+      }
+      .chat-popover {
+        padding: 12px;
+      }
+      .chat-popover-card {
+        width: min(520px, calc(100vw - 16px));
+        height: min(84vh, 620px);
+      }
+      .sara-main {
+        grid-template-columns: 1fr;
+      }
+      .help-title {
+        font-size: 26px;
       }
     }
   </style>
@@ -995,11 +1634,32 @@
 
     <aside class="panel-side">
       <section class="demo-panel" id="demoPanel"></section>
-      <section class="chat-panel" id="chatPanel"></section>
     </aside>
   </div>
 
   <div class="modal-shell" id="modalShell"></div>
+  <div class="chat-popover" id="chatPopover" aria-hidden="true">
+    <button type="button" class="chat-popover-backdrop" data-action="close-chat" aria-label="Close chat"></button>
+    <section class="chat-popover-card" role="dialog" aria-modal="true" aria-label="Ask SARA">
+      <header class="chat-popover-header">
+        <div>
+          <h2>Ask SARA</h2>
+          <p>Live assistant with ACL context.</p>
+        </div>
+        <button type="button" class="chat-close" data-action="close-chat" aria-label="Close chat">x</button>
+      </header>
+      <div class="chat-popover-body">
+        <div id="vapiHost" class="vapi-host"></div>
+        <div class="chat-popover-prompts">
+          <button type="button" class="chat-prompt-chip" data-action="assistant-prompt" data-prompt="What should I do today?">What should I do today?</button>
+          <button type="button" class="chat-prompt-chip" data-action="assistant-prompt" data-prompt="Open my day-of-surgery checklist.">Open checklist</button>
+          <button type="button" class="chat-prompt-chip" data-action="assistant-prompt" data-prompt="Let's do my recovery check-in.">Start check-in</button>
+        </div>
+        <div class="chat-popover-error" id="vapiStatusLine"></div>
+      </div>
+    </section>
+  </div>
+  <button type="button" class="chat-fab" data-action="open-chat">Ask SARA</button>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -1846,6 +2506,30 @@
 
     var STORAGE_KEY = 'sara_standalone_vori_state_v1';
     var RESET_SECONDS = 60;
+    var VAPI_WIDGET_SOURCES = [
+      'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js',
+      'https://cdn.jsdelivr.net/npm/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js'
+    ];
+    var VAPI_WIDGET_BASE = {
+      publicKey: '870ffb72-c038-4f0e-ba83-e2e4eefc3e96',
+      assistantId: 'e595d05f-6136-41d9-acfe-27a9559c4385',
+      mode: 'hybrid',
+      size: 'full',
+      position: 'bottom-right',
+      radius: 'large',
+      voiceShowTranscript: true,
+      showTranscript: true,
+      mainLabel: 'Ask SARA (ACL)',
+      emptyChatMessage: 'Ask me anything about your ACL surgery instructions.',
+      requireConsent: true,
+      termsContent: 'Not medical advice. If you have urgent symptoms, contact your surgeon or emergency services.',
+      localStorageKey: 'sara_acl_widget_consent'
+    };
+    var vapiSourceIndex = 0;
+    var vapiInstance = null;
+    var vapiWidgetStatus = 'idle';
+    var vapiPromptRetryTimer = null;
+    var pendingVapiPrompt = '';
 
     var PERSONAS = {
       achiever: {
@@ -1959,13 +2643,8 @@
         assetModal: { open: false, assetId: '', taskId: null },
         checkinModal: { open: false, taskId: null, value: 3, note: '' },
         resetModal: { open: false, running: false, secondsLeft: RESET_SECONDS },
-        quizModal: { open: false, taskId: null },
-        chatMessages: [
-          {
-            role: 'assistant',
-            text: 'Standalone mode is active. Ask for today plan, checklists, check-ins, PT milestones, or say "next".'
-          }
-        ]
+        quizModal: { open: false, taskId: null, step: 0 },
+        chatPopoverOpen: false
       };
     }
 
@@ -1978,9 +2657,8 @@
         var merged = createDefaultState();
         Object.assign(merged, parsed);
         merged.taskStatus = Object.assign(buildTaskStatus(), parsed.taskStatus || {});
-        if (!Array.isArray(merged.chatMessages) || !merged.chatMessages.length) {
-          merged.chatMessages = createDefaultState().chatMessages;
-        }
+        merged.quizModal = Object.assign({ open: false, taskId: null, step: 0 }, parsed.quizModal || {});
+        merged.chatPopoverOpen = Boolean(parsed.chatPopoverOpen);
         return merged;
       } catch (err) {
         return createDefaultState();
@@ -2006,6 +2684,215 @@
       toast._t = setTimeout(function () {
         el.classList.remove('show');
       }, 1800);
+    }
+
+    function compactValues(values) {
+      var out = {};
+      Object.keys(values || {}).forEach(function (key) {
+        var value = values[key];
+        if (value === undefined || value === null || value === '') return;
+        out[key] = String(value);
+      });
+      return out;
+    }
+
+    function buildAssistantVariableValues() {
+      var step = getCurrentStep();
+      var persona = state.personaId ? PERSONAS[state.personaId] : null;
+      var tasks = currentPhaseTasks().map(function (task) {
+        var done = Boolean(state.taskStatus[task.id] && state.taskStatus[task.id].completedAt);
+        return {
+          id: task.id,
+          title: task.title,
+          status: done ? 'COMPLETED' : 'PENDING',
+          aiPrompt: task.aiPrompt || ''
+        };
+      });
+      return compactValues({
+        procedureName: CONTENT.procedure && CONTENT.procedure.name,
+        procedurePhaseKey: state.activePhase,
+        procedureTimeline: phaseLabel(state.activePhase),
+        patientInitials: CONTENT.procedure && CONTENT.procedure.patientInitials,
+        todayPlanSummary: todayPlanSummaryText(),
+        todayPlan: JSON.stringify({ tasks: tasks }),
+        demoPathwayId: PATHWAY.id,
+        demoCurrentStepId: step && step.id,
+        demoCurrentStepTitle: step && step.title,
+        persona: persona ? JSON.stringify({
+          motifPrimary: persona.motifPrimary,
+          tone: persona.tone,
+          stylePrimary: persona.stylePrimary
+        }) : ''
+      });
+    }
+
+    function getVapiProps() {
+      var variableValues = buildAssistantVariableValues();
+      return Object.assign({}, VAPI_WIDGET_BASE, {
+        assistantOverrides: { variableValues: variableValues },
+        voiceAssistantOverrides: { variableValues: variableValues }
+      });
+    }
+
+    function renderChatPopoverStatus(message, isError) {
+      var statusLine = document.getElementById('vapiStatusLine');
+      if (!statusLine) return;
+      var text = message || '';
+      if (!text) {
+        if (vapiWidgetStatus === 'loading') text = 'Loading assistant...';
+        else if (vapiWidgetStatus === 'failed') text = 'Unable to load assistant. Check key/config or network.';
+        else if (vapiWidgetStatus === 'ready') text = '';
+      }
+      statusLine.textContent = text;
+      statusLine.classList.toggle('has-text', Boolean(text));
+      statusLine.classList.toggle('is-error', Boolean(isError || vapiWidgetStatus === 'failed'));
+    }
+
+    function resetVapiHost() {
+      var host = document.getElementById('vapiHost');
+      if (!host) return;
+      if (vapiInstance && typeof vapiInstance.destroy === 'function') {
+        try {
+          vapiInstance.destroy();
+        } catch (err) {
+          // ignore teardown issues
+        }
+      }
+      vapiInstance = null;
+      host.innerHTML = '';
+      host.dataset.vapiMounted = 'false';
+      vapiWidgetStatus = 'idle';
+      renderChatPopoverStatus('');
+    }
+
+    function flushVapiPrompt() {
+      if (!state.chatPopoverOpen || !pendingVapiPrompt) return false;
+      var host = document.getElementById('vapiHost');
+      if (!host) return false;
+      var root = host.querySelector('.vapi-widget-wrapper') || document.querySelector('.vapi-widget-wrapper');
+      if (!root) {
+        clearTimeout(vapiPromptRetryTimer);
+        vapiPromptRetryTimer = setTimeout(flushVapiPrompt, 180);
+        return false;
+      }
+      var input = root.querySelector('input[type="text"]');
+      var sendButton = root.querySelector('button[title="Send message"]')
+        || root.querySelector('button[aria-label="Send message"]')
+        || root.querySelector('button[type="submit"]');
+      if (!input || input.disabled || !sendButton || sendButton.disabled) {
+        clearTimeout(vapiPromptRetryTimer);
+        vapiPromptRetryTimer = setTimeout(flushVapiPrompt, 180);
+        return false;
+      }
+      if (input.value !== pendingVapiPrompt) {
+        input.value = pendingVapiPrompt;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      input.focus();
+      sendButton.click();
+      pendingVapiPrompt = '';
+      clearTimeout(vapiPromptRetryTimer);
+      return true;
+    }
+
+    function queueVapiPrompt(prompt) {
+      if (!prompt) return;
+      pendingVapiPrompt = String(prompt);
+      flushVapiPrompt();
+    }
+
+    function mountVapiWidget() {
+      var host = document.getElementById('vapiHost');
+      if (!host || typeof window.WidgetLoader !== 'function') return false;
+      if (host.dataset.vapiMounted === 'true' && host.querySelector('.vapi-widget-wrapper')) {
+        vapiWidgetStatus = 'ready';
+        renderChatPopoverStatus('');
+        flushVapiPrompt();
+        return true;
+      }
+      try {
+        vapiInstance = new window.WidgetLoader({
+          container: host,
+          component: 'VapiWidget',
+          props: getVapiProps()
+        });
+        host.dataset.vapiMounted = 'true';
+        vapiWidgetStatus = 'ready';
+        renderChatPopoverStatus('');
+        flushVapiPrompt();
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function loadVapiWidget(options) {
+      var opts = options || {};
+      var force = Boolean(opts.force);
+      if (force) resetVapiHost();
+      if (mountVapiWidget()) return;
+
+      vapiWidgetStatus = 'loading';
+      renderChatPopoverStatus('');
+      var source = VAPI_WIDGET_SOURCES[Math.min(vapiSourceIndex, VAPI_WIDGET_SOURCES.length - 1)];
+      var existing = document.querySelector('script[data-vapi-widget-source="' + source + '"]')
+        || document.querySelector('script[src="' + source + '"]');
+
+      var fail = function () {
+        if (vapiSourceIndex < VAPI_WIDGET_SOURCES.length - 1) {
+          vapiSourceIndex += 1;
+          loadVapiWidget({ force: true });
+          return;
+        }
+        vapiWidgetStatus = 'failed';
+        renderChatPopoverStatus('', true);
+      };
+
+      var loaded = function () {
+        if (mountVapiWidget()) return;
+        fail();
+      };
+
+      if (!existing) {
+        var script = document.createElement('script');
+        script.src = source;
+        script.async = true;
+        script.type = 'text/javascript';
+        script.dataset.vapiWidgetSource = source;
+        script.onload = loaded;
+        script.onerror = fail;
+        document.head.appendChild(script);
+      } else if (existing.hasAttribute('data-vapi-ready') || typeof window.WidgetLoader === 'function') {
+        loaded();
+      } else {
+        existing.addEventListener('load', function () {
+          existing.setAttribute('data-vapi-ready', 'true');
+          loaded();
+        }, { once: true });
+        existing.addEventListener('error', fail, { once: true });
+      }
+    }
+
+    function openChatPopover(options) {
+      closeOverlays();
+      state.chatPopoverOpen = true;
+      if (options && options.prompt) {
+        pendingVapiPrompt = String(options.prompt);
+      }
+      commit();
+      loadVapiWidget();
+      if (pendingVapiPrompt) {
+        setTimeout(function () {
+          flushVapiPrompt();
+        }, 150);
+      }
+    }
+
+    function closeChatPopover() {
+      state.chatPopoverOpen = false;
+      pendingVapiPrompt = '';
+      clearTimeout(vapiPromptRetryTimer);
+      commit();
     }
 
     function getCurrentStep() {
@@ -2045,36 +2932,81 @@
       setStepByIndex(getStepIndex(stepId), state.autoRun);
     }
 
+    function resetQuizProgress() {
+      state.quizAnswers = {};
+      state.personaId = '';
+      state.personaProfile = null;
+      state.quizModal = { open: false, taskId: null, step: 0 };
+      if (state.taskStatus && state.taskStatus.task_behavior_quiz) {
+        state.taskStatus.task_behavior_quiz = { status: 'PENDING', completedAt: null, data: {} };
+      }
+    }
+
     function resetPathway() {
+      resetQuizProgress();
       setStepByIndex(0, state.autoRun);
     }
 
-    function runStepOnEnter(step) {
-      if (!step || !Array.isArray(step.onEnter)) return;
-      step.onEnter.forEach(function (action) {
+    function runStepOnEnter(step, options) {
+      var opts = options || {};
+      if (!step) return 0;
+      var executed = 0;
+      var actions = Array.isArray(step.onEnter) ? step.onEnter : [];
+      actions.forEach(function (action) {
         var type = action && action.type;
         if (!type) return;
         if (type === 'SET_TAB') {
           state.activeTab = action.tab || 'today';
+          executed += 1;
         } else if (type === 'SET_PHASE') {
           state.activePhase = normalizePhase(action.phase);
+          executed += 1;
         } else if (type === 'OPEN_DECK') {
           openDeck(action.deckId, null, 'step');
+          executed += 1;
         } else if (type === 'OPEN_ASSET') {
           openAsset(action.assetId, null, 'step');
+          executed += 1;
         } else if (type === 'START_CHECKIN') {
           openCheckin(action.checkinKey || action.taskId);
+          executed += 1;
         } else if (type === 'CLOSE_OVERLAYS') {
           closeOverlays();
+          executed += 1;
         } else if (type === 'SET_LIBRARY_FILTER') {
           state.libraryQuery = (action.filter && action.filter.query) || '';
           state.activeTab = 'library';
+          executed += 1;
         } else if (type === 'OPEN_PANEL') {
-          if (action.panel === 'personaPicker') openBehaviorQuiz('task_behavior_quiz');
+          if (action.panel === 'personaPicker') {
+            openBehaviorQuiz('task_behavior_quiz');
+            executed += 1;
+          }
         } else if (type === 'HIGHLIGHT') {
           state.highlightKey = action.key || '';
+          executed += 1;
         }
       });
+
+      // Fallbacks for steps that only define recommendations (or have no onEnter actions).
+      if (executed === 0 && opts.allowFallback !== false) {
+        if (step.tab) {
+          state.activeTab = step.tab;
+          executed += 1;
+        }
+        if (step.recommendedCheckinTaskId) {
+          openCheckin(step.recommendedCheckinTaskId);
+          executed += 1;
+        } else if (step.recommendedDeckId) {
+          openDeck(step.recommendedDeckId, null, 'step');
+          executed += 1;
+        } else if (step.recommendedAssetId) {
+          openAsset(step.recommendedAssetId, null, 'step');
+          executed += 1;
+        }
+      }
+
+      return executed;
     }
 
     function closeOverlays() {
@@ -2082,7 +3014,7 @@
       state.assetModal = { open: false, assetId: '', taskId: null };
       state.checkinModal.open = false;
       state.resetModal.open = false;
-      state.quizModal.open = false;
+      state.quizModal = { open: false, taskId: null, step: 0 };
       stopResetTimer();
     }
 
@@ -2117,7 +3049,7 @@
 
     function openAsset(assetId, taskId, source) {
       if (!assetId || !assetsById[assetId]) {
-        toast('Asset not found in standalone pack.');
+        toast('Asset not found in this content pack.');
         return;
       }
       var asset = assetsById[assetId];
@@ -2166,8 +3098,12 @@
     }
 
     function openBehaviorQuiz(taskId) {
+      var firstUnansweredStep = QUIZ.findIndex(function (item) {
+        return !(state.quizAnswers && state.quizAnswers[item.id]);
+      });
       state.quizModal.open = true;
       state.quizModal.taskId = taskId || 'task_behavior_quiz';
+      state.quizModal.step = firstUnansweredStep >= 0 ? firstUnansweredStep : 0;
       state.activeTab = 'today';
       state.highlightKey = 'personaPicker';
     }
@@ -2199,6 +3135,7 @@
         completeTask(state.quizModal.taskId, { behaviorQuiz: true, personaId: personaId });
       }
       state.quizModal.open = false;
+      state.quizModal.step = 0;
       toast('Behavior profile saved: ' + PERSONAS[personaId].title + '.');
     }
 
@@ -2228,87 +3165,25 @@
       return top.join('\n');
     }
 
-    function addChat(role, text) {
-      state.chatMessages.push({ role: role, text: text, at: nowIso() });
-      if (state.chatMessages.length > 24) state.chatMessages = state.chatMessages.slice(-24);
-    }
-
     function sendAssistantPrompt(prompt, logUser) {
       var text = String(prompt || '').trim();
       if (!text) return false;
       var normalized = text.toLowerCase();
-      if (logUser) addChat('user', text);
 
       if (normalized.includes('behavior quiz')) {
         openBehaviorQuiz('task_behavior_quiz');
-        addChat('assistant', 'Opening the behavior quiz now.');
+        toast('Opening the behavior quiz.');
         commit();
         return true;
       }
 
       if (normalized === 'next' || normalized.includes('continue')) {
         nextStep();
-        addChat('assistant', 'Advanced to the next walkthrough step.');
+        toast('Advanced to the next walkthrough step.');
         commit();
         return true;
       }
-
-      if (normalized.includes('what should i do') || normalized.includes('today plan')) {
-        addChat('assistant', 'Here is your plan for ' + phaseLabel(state.activePhase) + ':\n' + todayPlanSummaryText());
-        commit();
-        return true;
-      }
-
-      if (normalized.includes('checklist')) {
-        openDeck('deck_checklist', 'task_open_checklist', 'assistant');
-        addChat('assistant', 'Opened the day-of-surgery checklist.');
-        commit();
-        return true;
-      }
-
-      if (normalized.includes('post-op day 2 guide') || normalized.includes('postop guide')) {
-        state.activePhase = 'recovery';
-        openDeck('deck_postop_guide', 'task_postop_guide', 'assistant');
-        addChat('assistant', 'Opened your post-op day 2 guide.');
-        commit();
-        return true;
-      }
-
-      if (normalized.includes('wound')) {
-        state.activePhase = 'recovery';
-        openDeck('deck_wound_check', 'task_postop_wound_check', 'assistant');
-        addChat('assistant', 'Opened wound check guidance.');
-        commit();
-        return true;
-      }
-
-      if (normalized.includes('check-in') || normalized.includes('check in')) {
-        if (state.activePhase === 'recovery') {
-          openCheckin('task_postop_pain_check');
-        } else {
-          openCheckin('task_daily_checkin');
-        }
-        addChat('assistant', 'Opened the check-in.');
-        commit();
-        return true;
-      }
-
-      if (normalized.includes('pt')) {
-        state.activePhase = 'recovery';
-        if (normalized.includes('library') || normalized.includes('show me')) {
-          state.activeTab = 'library';
-          state.libraryQuery = 'PT';
-          addChat('assistant', 'Switched to Library and filtered for PT resources.');
-        } else {
-          openDeck('deck_pt_milestones', 'task_postop_pt_reminder', 'assistant');
-          addChat('assistant', 'Opened PT milestones.');
-        }
-        commit();
-        return true;
-      }
-
-      addChat('assistant', 'In standalone mode I can run the behavior quiz, open decks/resources, run check-ins, and step the walkthrough.');
-      commit();
+      openChatPopover({ prompt: text });
       return true;
     }
 
@@ -2382,23 +3257,41 @@
     function renderTop() {
       var top = document.getElementById('topPanel');
       var persona = state.personaId ? PERSONAS[state.personaId] : null;
+      var allTasks = (CONTENT.todayTasks || []);
+      var completedCount = allTasks.filter(function (task) {
+        return state.taskStatus[task.id] && state.taskStatus[task.id].completedAt;
+      }).length;
+      var totalCount = allTasks.length;
+      var progressPercent = totalCount ? Math.max(0, Math.min(100, Math.round((completedCount / totalCount) * 100))) : 0;
+      var phaseInline = state.activePhase === 'recovery' ? 'Post-Op' : 'Pre-Op';
       top.innerHTML = ''
         + '<div class="headline">'
         + '  <div>'
-        + '    <h1>' + escapeHtml(phaseLabel(state.activePhase)) + ' - ' + escapeHtml(CONTENT.procedure.name) + '</h1>'
-        + '    <div class="sub">Standalone walkthrough mode (no backend). Patient ' + escapeHtml(CONTENT.procedure.patientInitials || 'RV') + '</div>'
+        + '    <h1>' + escapeHtml(phaseLabel(state.activePhase)) + '</h1>'
+        + '    <div class="procedure-name">' + escapeHtml(CONTENT.procedure.name) + '</div>'
+        + '    <div class="sub">Patient ' + escapeHtml(CONTENT.procedure.patientInitials || 'RV') + '</div>'
+        + '    <div class="progress-wrap">'
+        + '      <div class="progress-top">'
+        + '        <span class="progress-percent">' + progressPercent + '%</span>'
+        + '        <span class="progress-text">Overall: ' + completedCount + ' of ' + totalCount + ' complete</span>'
+        + '      </div>'
+        + '      <div class="progress-bar"><span class="progress-fill" style="width:' + progressPercent + '%"></span></div>'
+        + '    </div>'
         + '  </div>'
         + '  <button class="btn ghost" data-action="reset-demo">Reset demo</button>'
         + '</div>'
-        + '<div class="chips">'
-        + '  <button class="chip ' + (state.activePhase === 'preop' ? 'active' : '') + '" data-action="switch-phase" data-phase="preop">Pre-Op Day</button>'
-        + '  <button class="chip ' + (state.activePhase === 'recovery' ? 'active' : '') + '" data-action="switch-phase" data-phase="recovery">Post-Op Day 2</button>'
+        + '<div class="top-actions">'
+        + '  <div class="chips">'
+        + '    <button class="chip ' + (state.activePhase === 'preop' ? 'active' : '') + '" data-action="switch-phase" data-phase="preop">Pre-Op Day</button>'
+        + '    <button class="chip ' + (state.activePhase === 'recovery' ? 'active' : '') + '" data-action="switch-phase" data-phase="recovery">Post-Op Day 2</button>'
+        + '  </div>'
+        + '  <div class="tabs">'
+        + '    <button class="tab ' + (state.activeTab === 'today' ? 'active' : '') + '" data-action="switch-tab" data-tab="today">Today</button>'
+        + '    <button class="tab ' + (state.activeTab === 'journey' ? 'active' : '') + '" data-action="switch-tab" data-tab="journey">Journey</button>'
+        + '    <button class="tab ' + (state.activeTab === 'library' ? 'active' : '') + '" data-action="switch-tab" data-tab="library">Library</button>'
+        + '  </div>'
         + '</div>'
-        + '<div class="tabs">'
-        + '  <button class="tab ' + (state.activeTab === 'today' ? 'active' : '') + '" data-action="switch-tab" data-tab="today">Today</button>'
-        + '  <button class="tab ' + (state.activeTab === 'journey' ? 'active' : '') + '" data-action="switch-tab" data-tab="journey">Journey</button>'
-        + '  <button class="tab ' + (state.activeTab === 'library' ? 'active' : '') + '" data-action="switch-tab" data-tab="library">Library</button>'
-        + '</div>'
+        + '<div class="phase-line">Phase: ' + escapeHtml(phaseInline) + '</div>'
         + '<div class="persona">'
         + '  <span class="tiny">Persona:</span>'
         + (persona ? '<span class="pill">' + escapeHtml(persona.title) + '</span><span class="tiny">' + escapeHtml(persona.planTone) + '</span>' : '<span class="tiny">Not set yet.</span>')
@@ -2410,20 +3303,68 @@
       var pending = pendingTaskCount(tasks);
       var summary = pending + ' of ' + tasks.length + ' tasks remaining';
       var heroClass = 'today-hero' + (state.highlightKey === 'todayPlan' ? ' highlight' : '');
+      var openTasks = tasks.filter(function (task) {
+        return !(state.taskStatus[task.id] && state.taskStatus[task.id].completedAt);
+      });
+      var primaryTask = openTasks.find(function (task) { return task.id !== 'task_behavior_quiz'; }) || openTasks[0] || tasks[0] || null;
+      var secondaryTask = openTasks.find(function (task) { return primaryTask && task.id !== primaryTask.id; }) || null;
+      var faqs = (CONTENT.commonQuestions || []).filter(function (faq) {
+        return normalizePhase(faq.phase || faq.phaseKey || faq.topic) === state.activePhase;
+      });
+      if (!faqs.length) faqs = (CONTENT.commonQuestions || []).slice(0, 2);
+      var quickFaqs = faqs.slice(0, 2);
+      var promptCandidates = [];
+      if (primaryTask && primaryTask.aiPrompt) promptCandidates.push(primaryTask.aiPrompt);
+      if (state.activePhase === 'recovery') {
+        promptCandidates.push('What should I focus on in PT today?');
+        promptCandidates.push('Is this pain and swelling normal?');
+      } else {
+        promptCandidates.push('What should I do today?');
+        promptCandidates.push('Which meds can I take?');
+      }
+      var promptMap = {};
+      promptCandidates = promptCandidates.filter(function (prompt) {
+        var key = String(prompt || '').trim().toLowerCase();
+        if (!key || promptMap[key]) return false;
+        promptMap[key] = true;
+        return true;
+      }).slice(0, 3);
 
       var html = ''
         + '<div class="today-wrap">'
-        + '  <div class="' + heroClass + '">'
-        + '    <div class="hero-row">'
-        + '      <div>'
-        + '        <div class="tiny">Today Plan</div>'
-        + '        <div><strong>' + escapeHtml(summary) + '</strong></div>'
-        + '      </div>'
-        + '      <button class="btn ghost" data-action="open-quiz">Take quiz</button>'
-        + '    </div>'
-        + '    <div class="tiny">' + escapeHtml(todayPlanSummaryText()).replace(/\n/g, ' | ') + '</div>'
-        + '  </div>'
-        + '  <div class="tasks">';
+        + '  <div class="today-grid">'
+        + '    <div class="today-main">'
+        + '      <div class="' + heroClass + '">'
+        + '        <div class="hero-row">'
+        + '          <div>'
+        + '            <div class="tiny">Today Plan</div>'
+        + '            <div><strong>' + escapeHtml(summary) + '</strong></div>'
+        + '          </div>'
+        + '          <div class="hero-actions">'
+        + '            <button class="btn ghost" data-action="open-quiz">Take quiz</button>'
+        + '            <button class="hero-link" data-action="switch-tab" data-tab="journey">View all tasks (' + tasks.length + ')</button>'
+        + '          </div>'
+        + '        </div>'
+        + '        <div class="tiny">' + escapeHtml(todayPlanSummaryText()).replace(/\n/g, ' | ') + '</div>'
+        + '      </div>';
+
+      if (primaryTask) {
+        html += ''
+          + '      <div class="sara-panel">'
+          + '        <div class="sara-kicker">SARA&apos;s plan for you today' + (state.personaId ? ' - ' + escapeHtml(PERSONAS[state.personaId].title) : '') + '</div>'
+          + '        <div class="sara-main">'
+          + '          <div>'
+          + '            <h3 class="sara-title">' + escapeHtml(primaryTask.title) + '</h3>'
+          + '            <p class="sara-why">' + escapeHtml(primaryTask.reason || primaryTask.desc || '') + '</p>'
+          + '          </div>'
+          + '          <button class="btn primary" data-action="task-primary" data-task-id="' + escapeHtml(primaryTask.id) + '">Start next</button>'
+          + '        </div>'
+          + (secondaryTask ? '<div class="sara-next">Next up: ' + escapeHtml(secondaryTask.title) + '</div>' : '')
+          + (primaryTask.aiPrompt ? '<button class="sara-ask" data-action="assistant-prompt" data-prompt="' + escapeHtml(primaryTask.aiPrompt) + '">Ask about this plan</button>' : '')
+          + '      </div>';
+      }
+
+      html += '      <div class="tasks">';
 
       tasks.forEach(function (task) {
         var done = !!(state.taskStatus[task.id] && state.taskStatus[task.id].completedAt);
@@ -2444,7 +3385,33 @@
           + '</article>';
       });
 
-      html += '</div></div>';
+      html += '</div></div>'
+        + '    <aside class="today-side">'
+        + '      <div class="help-card">'
+        + '        <h3 class="help-title">Need help?</h3>'
+        + '        <div class="help-sub">Quick answers or ask SARA.</div>';
+
+      quickFaqs.forEach(function (faq) {
+        var prompt = faq.question || '';
+        html += ''
+          + '        <button class="faq-item" data-action="assistant-prompt" data-prompt="' + escapeHtml(prompt) + '">'
+          + '          <span class="faq-topic">' + escapeHtml((faq.topic || faq.phase || '').toUpperCase()) + '</span>'
+          + '          <span class="faq-question">' + escapeHtml(faq.question || '') + '</span>'
+          + '        </button>';
+      });
+
+      if (promptCandidates.length) {
+        html += '<div class="prompt-chips">';
+        promptCandidates.forEach(function (prompt) {
+          html += '<button class="prompt-chip" data-action="assistant-prompt" data-prompt="' + escapeHtml(prompt) + '">' + escapeHtml(prompt) + '</button>';
+        });
+        html += '</div>';
+      }
+
+      html += '      </div>'
+        + '    </aside>'
+        + '  </div>'
+        + '</div>';
       return html;
     }
 
@@ -2576,23 +3543,15 @@
         + '</div>';
     }
 
-    function renderChatPanel() {
-      var panel = document.getElementById('chatPanel');
-      var messages = '';
-      (state.chatMessages || []).forEach(function (msg) {
-        messages += '<div class="msg ' + (msg.role === 'user' ? 'user' : 'assistant') + '">' + escapeHtml(msg.text).replace(/\n/g, '<br/>') + '</div>';
-      });
-      panel.innerHTML = ''
-        + '<div class="chat-head"><strong>Local Assistant</strong><div class="tiny">Deterministic fallback, no network calls.</div></div>'
-        + '<div class="chat-body">'
-        + '  <div class="chat-log" id="chatLog">' + messages + '</div>'
-        + '  <form class="chat-form" id="chatForm">'
-        + '    <input class="input" id="chatInput" placeholder="Try: What should I do today?" />'
-        + '    <button class="btn primary" type="submit">Send</button>'
-        + '  </form>'
-        + '</div>';
-      var log = document.getElementById('chatLog');
-      log.scrollTop = log.scrollHeight;
+    function renderChatPopover() {
+      var popover = document.getElementById('chatPopover');
+      if (!popover) return;
+      var isOpen = Boolean(state.chatPopoverOpen);
+      popover.classList.toggle('show', isOpen);
+      popover.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      if (isOpen) document.body.dataset.vapiOpen = 'true';
+      else delete document.body.dataset.vapiOpen;
+      renderChatPopoverStatus('');
     }
 
     function renderModal() {
@@ -2601,28 +3560,54 @@
 
       if (state.quizModal.open) {
         var personaNote = state.personaId ? 'Current persona: ' + PERSONAS[state.personaId].title : 'No persona selected yet.';
+        var totalQuizSteps = QUIZ.length;
+        var safeStep = Math.max(0, Math.min(Number(state.quizModal.step || 0), Math.max(totalQuizSteps - 1, 0)));
+        state.quizModal.step = safeStep;
+        var currentQuestion = QUIZ[safeStep];
+        var currentAnswer = currentQuestion ? state.quizAnswers[currentQuestion.id] : '';
+        var isCurrentAnswered = Boolean(currentAnswer);
+        var quizProgress = totalQuizSteps ? Math.round(((safeStep + 1) / totalQuizSteps) * 100) : 0;
+        var stepLabel = 'Question ' + (safeStep + 1) + ' of ' + totalQuizSteps;
         html = ''
-          + '<article class="modal">'
+          + '<article class="modal quiz-modal">'
           + '  <button class="close-x" data-action="close-modal">x</button>'
-          + '  <h2 style="margin:0;">Behavior Quiz</h2>'
-          + '  <div class="muted">Question-based personalization for demo tone and planning style.</div>'
-          + '  <div class="tiny">' + escapeHtml(personaNote) + '</div>'
-          + '  <div class="quiz-grid">';
-        QUIZ.forEach(function (q) {
-          html += '<section class="quiz-item"><strong>' + escapeHtml(q.prompt) + '</strong><div class="quiz-options">';
-          q.options.forEach(function (opt) {
-            var checked = state.quizAnswers[q.id] === opt.id ? 'checked' : '';
+          + '  <div class="quiz-modal-head">'
+          + '    <div>'
+          + '      <h3 class="quiz-modal-title">Behavior quiz</h3>'
+          + '      <p class="quiz-modal-sub">Answer the quick quiz to personalize SARA tone and plan framing.</p>'
+          + '      <div class="quiz-persona-note">' + escapeHtml(personaNote) + '</div>'
+          + '    </div>'
+          + '  </div>'
+          + '  <div class="behavior-quiz-lite">'
+          + '    <div class="behavior-progress-wrap">'
+          + '      <div class="behavior-progress"><span class="behavior-progress-bar" style="width:' + quizProgress + '%"></span></div>'
+          + '      <div class="behavior-progress-meta"><span>' + escapeHtml(stepLabel) + '</span><strong>' + quizProgress + '%</strong></div>'
+          + '    </div>'
+          + '    <section class="behavior-card">'
+          + '      <h4 class="behavior-question-title">' + escapeHtml(currentQuestion ? currentQuestion.prompt : 'Behavior question') + '</h4>'
+          + '      <p class="behavior-question-helper">Pick the option that fits you best right now.</p>'
+          + '      <div class="behavior-options">';
+        if (currentQuestion && Array.isArray(currentQuestion.options)) {
+          currentQuestion.options.forEach(function (opt) {
+            var checked = currentAnswer === opt.id ? 'checked' : '';
+            var selected = currentAnswer === opt.id ? ' selected' : '';
             html += ''
-              + '<label class="quiz-option">'
-              + '  <input type="radio" name="quiz_' + escapeHtml(q.id) + '" value="' + escapeHtml(opt.id) + '" data-action="quiz-answer" data-question-id="' + escapeHtml(q.id) + '" ' + checked + ' />'
+              + '<label class="behavior-option' + selected + '">'
+              + '  <input type="radio" name="quiz_' + escapeHtml(currentQuestion.id) + '" value="' + escapeHtml(opt.id) + '" data-action="quiz-answer" data-question-id="' + escapeHtml(currentQuestion.id) + '" ' + checked + ' />'
               + '  <span>' + escapeHtml(opt.text) + '</span>'
               + '</label>';
           });
-          html += '</div></section>';
-        });
+        }
         html += ''
           + '  </div>'
-          + '  <div><button class="btn primary" data-action="submit-quiz">Save profile</button></div>'
+          + '    </section>'
+          + '    <div class="behavior-actions">'
+          + '      <button class="btn ghost" data-action="quiz-back" ' + (safeStep === 0 ? 'disabled' : '') + '>Back</button>'
+          + '      <div class="behavior-actions-right">'
+          + '        <button class="btn primary" data-action="quiz-next" ' + (!isCurrentAnswered ? 'disabled' : '') + '>' + (safeStep === totalQuizSteps - 1 ? 'Save profile' : 'Next') + '</button>'
+          + '      </div>'
+          + '    </div>'
+          + '  </div>'
           + '</article>';
       } else if (state.deckModal.open) {
         var deckId = state.deckModal.deckId;
@@ -2630,7 +3615,13 @@
         var asset = resolveAssetForDeck(deckId, state.deckModal.assetId);
         var slide = slides[state.deckModal.index] || null;
         var hasOriginal = !!(asset && (asset.original || asset.summary));
-        var stepText = slides.length ? ('Slide ' + (state.deckModal.index + 1) + ' of ' + slides.length) : 'No card slides';
+        var showingCards = state.deckModal.mode === 'cards' && slides.length > 0;
+        var stepText = showingCards
+          ? ('Slide ' + (state.deckModal.index + 1) + ' of ' + slides.length)
+          : (hasOriginal ? 'Original guide view' : 'No card slides');
+        var canGoPrev = showingCards && state.deckModal.index > 0;
+        var canGoNext = showingCards && state.deckModal.index < slides.length - 1;
+        var canMarkUnderstood = showingCards && !canGoNext;
 
         html = ''
           + '<article class="modal">'
@@ -2646,7 +3637,7 @@
             + '</div>';
         }
 
-        if (state.deckModal.mode === 'cards' && slides.length) {
+        if (showingCards) {
           html += '<section class="deck-slide">'
             + '<h3 style="margin:0;">' + escapeHtml(slide.title || '') + '</h3>'
             + '<div class="muted">' + escapeHtml(slide.lede || '') + '</div>'
@@ -2671,11 +3662,14 @@
 
         html += ''
           + '  <div class="deck-nav">'
-          + '    <button class="btn ghost" data-action="deck-prev" ' + (state.deckModal.index <= 0 ? 'disabled' : '') + '>Back</button>'
+          + '    <button class="btn ghost" data-action="deck-prev" ' + (canGoPrev ? '' : 'disabled') + '>Back</button>'
           + '    <div class="tiny" style="text-align:center;">' + escapeHtml(stepText) + '</div>'
-          + '    <button class="btn primary" data-action="deck-next" ' + (slides.length && state.deckModal.index < slides.length - 1 ? '' : 'disabled') + '>Next</button>'
+          + (canGoNext
+            ? '    <button class="btn primary" data-action="deck-next">Next</button>'
+            : (canMarkUnderstood
+              ? '    <button class="btn primary" data-action="deck-understood">Mark as understood</button>'
+              : '    <button class="btn ghost" disabled>--</button>'))
           + '  </div>'
-          + '  <div><button class="btn primary" data-action="deck-understood">Mark as understood</button></div>'
           + '</article>';
       } else if (state.assetModal.open) {
         var activeAsset = assetsById[state.assetModal.assetId];
@@ -2741,7 +3735,7 @@
       renderTop();
       renderView();
       renderDemoPanel();
-      renderChatPanel();
+      renderChatPopover();
       renderModal();
     }
 
@@ -2756,6 +3750,10 @@
       } else if (action === 'switch-phase') {
         state.activePhase = normalizePhase(target.getAttribute('data-phase') || 'preop');
         commit();
+      } else if (action === 'open-chat') {
+        openChatPopover();
+      } else if (action === 'close-chat') {
+        closeChatPopover();
       } else if (action === 'task-primary') {
         var taskId = target.getAttribute('data-task-id');
         taskPrimaryAction(tasksById[taskId]);
@@ -2788,20 +3786,34 @@
       } else if (action === 'step-reset') {
         resetPathway();
       } else if (action === 'run-step') {
-        runStepOnEnter(getCurrentStep());
+        var ran = runStepOnEnter(getCurrentStep());
         commit();
+        toast(ran ? ('Ran ' + ran + ' step action' + (ran === 1 ? '' : 's') + '.') : 'No step actions available for this step.');
       } else if (action === 'close-modal') {
         closeOverlays();
         commit();
       } else if (action === 'deck-prev') {
+        if (state.deckModal.mode !== 'cards') return;
         state.deckModal.index = Math.max(0, state.deckModal.index - 1);
         commit();
       } else if (action === 'deck-next') {
+        if (state.deckModal.mode !== 'cards') return;
         var slides = (CONTENT.decks && CONTENT.decks[state.deckModal.deckId]) || [];
+        if (!slides.length) return;
         state.deckModal.index = Math.min(slides.length - 1, state.deckModal.index + 1);
         commit();
       } else if (action === 'deck-mode') {
         state.deckModal.mode = target.getAttribute('data-mode') || 'cards';
+        if (state.deckModal.mode !== 'cards') {
+          state.deckModal.index = 0;
+        } else {
+          var modeSlides = (CONTENT.decks && CONTENT.decks[state.deckModal.deckId]) || [];
+          if (!modeSlides.length) {
+            state.deckModal.index = 0;
+          } else {
+            state.deckModal.index = Math.max(0, Math.min(state.deckModal.index, modeSlides.length - 1));
+          }
+        }
         commit();
       } else if (action === 'deck-understood') {
         if (state.deckModal.taskId) completeTask(state.deckModal.taskId, { understood: true, deckId: state.deckModal.deckId });
@@ -2816,8 +3828,25 @@
       } else if (action === 'submit-checkin') {
         submitCheckin();
         commit();
-      } else if (action === 'submit-quiz') {
-        submitBehaviorQuiz();
+      } else if (action === 'quiz-back') {
+        if (!state.quizModal.open) return;
+        state.quizModal.step = Math.max(0, Number(state.quizModal.step || 0) - 1);
+        commit();
+      } else if (action === 'quiz-next') {
+        if (!state.quizModal.open) return;
+        var quizTotal = QUIZ.length;
+        if (!quizTotal) return;
+        var quizStep = Math.max(0, Math.min(Number(state.quizModal.step || 0), quizTotal - 1));
+        var activeQuestion = QUIZ[quizStep];
+        if (!activeQuestion || !state.quizAnswers[activeQuestion.id]) {
+          toast('Please choose an answer to continue.');
+          return;
+        }
+        if (quizStep >= quizTotal - 1) {
+          submitBehaviorQuiz();
+        } else {
+          state.quizModal.step = quizStep + 1;
+        }
         commit();
       } else if (action === 'quiz-answer') {
         var qid = target.getAttribute('data-question-id');
@@ -2864,14 +3893,9 @@
       }
     });
 
-    document.addEventListener('submit', function (event) {
-      if (event.target && event.target.id === 'chatForm') {
-        event.preventDefault();
-        var input = document.getElementById('chatInput');
-        var value = input ? input.value : '';
-        if (!value.trim()) return;
-        sendAssistantPrompt(value, true);
-        input.value = '';
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && state.chatPopoverOpen) {
+        closeChatPopover();
       }
     });
 
